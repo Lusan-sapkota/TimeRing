@@ -6,19 +6,16 @@
   **A lightweight, modern, and beautiful timer application for your desktop.**
   
   [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Lusan-sapkota/TimeRing)
-  [![Python](https://img.shields.io/badge/python-3.7+-green.svg)](https://www.python.org/)
+  [![Python](https://img.shields.io/badge/python-3.11+-green.svg)](https://www.python.org/)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
   [![Platform](https://img.shields.io/badge/platform-Linux-orange.svg)](#platform-compatibility)
   
   [**View on GitHub**](https://github.com/Lusan-sapkota/TimeRing)
 </div>
 
-<!-- Optional: Add a screenshot or GIF of the application in action -->
-<!-- 
 <div align="center">
-  <img src="path/to/your/screenshot.png" alt="TimeRing Screenshot" width="700">
+  <img src="./demo/images/timering.png" alt="TimeRing Screenshot" width="700">
 </div>
--->
 
 TimeRing is a versatile and user-friendly timer application designed to help you manage your time effectively. Whether you're working, studying, or cooking, TimeRing provides a clean and intuitive interface to run multiple timers at once. Built with PyQt5, it's designed with a focus on Linux but is architected to be cross-platform.
 
@@ -47,64 +44,64 @@ TimeRing is a versatile and user-friendly timer application designed to help you
 
 ### ⚙️ Advanced Features
 
+- **Timer Navigation**: Navigate between multiple running timers with Previous/Next buttons in the active timer display.
+- **Enhanced Status Management**: Clear visual distinction between paused, finished, and time's up states.
+- **Auto Update Check**: Automatically check for new releases and update with one click.
+- **Compact Mode**: Responsive design that adapts to smaller screens (720p displays).
+- **Smooth Scrolling**: Optimized timer list with pixel-perfect scrolling and position preservation.
 - **CLI Support**: Basic command-line arguments for automation.
 - **External Styling**: Customizable appearance via Qt's QSS stylesheets.
 - **Settings Management**: Configure default sounds, notifications, and application behavior.
 
 ## 📦 Installation
 
+For an easy installation on Debian-based systems (like Ubuntu), a `.deb` package will be available in the [GitHub Releases](https://github.com/Lusan-sapkota/TimeRing/releases) section and on SourceForge. This is the recommended method for most users.
+
+For other systems or for development, you can install from source.
+
 ### Prerequisites
+
+Ensure Python 3.11+ and `pip` are installed on your system.
 
 ```bash
 # Ubuntu/Debian
 sudo apt update
-sudo apt install python3 python3-pip python3-pyqt5 python3-vlc
+sudo apt install python3 python3-pip
 
 # Fedora/RHEL
-sudo dnf install python3 python3-pip python3-qt5 python3-vlc
+sudo dnf install python3 python3-pip
 
 # Arch Linux
-sudo pacman -S python python-pip python-pyqt5 python-vlc
+sudo pacman -S python python-pip
+
 ```
 
-### Dependencies
+### Installation from Source
 
-Install the required Python packages using the `requirements.txt` file:
-
-```bash
-pip3 install -r requirements.txt
-```
-
-### Quick Setup
-
-1. Clone the repository:
+1. **Clone the repository:**
 
     ```bash
     git clone https://github.com/Lusan-sapkota/TimeRing.git
     cd TimeRing
     ```
 
-2. Ensure the directory structure is correct:
-
-    ```text
-    TimeRing/
-    ├── main.py
-    ├── style.qss
-    ├── requirements.txt
-    ├── README.md
-    ├── images/
-    │   └── logo.png
-    └── sounds/
-        └── timesup.mp3
-    ```
-
-3. Make the main script executable (optional):
+2. **Create and activate a virtual environment:**
 
     ```bash
-    chmod +x main.py
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+    *On Windows, you would use `venv\Scripts\activate`.*
+
+3. **Install dependencies:**
+
+    Inside the activated virtual environment, install the required Python packages.
+
+    ```bash
+    pip install -r requirements.txt
     ```
 
-4. Run the application:
+4. **Run the application:**
 
     ```bash
     python3 main.py
@@ -129,9 +126,17 @@ Each active timer card displays its name, remaining time, and status. The action
 - **Ringing**: A **Stop** button is shown to silence the alarm. The card turns yellow.
 - **Finished**: A **Rerun** button appears, allowing you to start the same timer again instantly.
 
-### Menu Drawer
+### Active Timer Display
 
-Click the hamburger menu icon (☰) to access:
+The large active timer display shows the currently selected running timer with enhanced controls:
+
+- **Previous/Next Buttons**: Navigate between multiple running timers.
+- **Enhanced Status**: Clear distinction between "Time's Up", "Paused", and "Running" states.
+- **Disabled Controls**: Resume button is properly disabled for finished timers.
+
+### Menu Header
+
+Click each menu icon to access:
 
 - **Settings**: Change the default sound and open the preferences dialog.
 - **Help**: Quick guides and feature overviews.
