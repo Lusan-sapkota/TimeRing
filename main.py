@@ -889,10 +889,20 @@ class TimerApp(QMainWindow):
         header_widget = QWidget()
         header_layout = QHBoxLayout(header_widget)
         header_layout.setContentsMargins(0, 0, 0, 0)
+        header_layout.setSpacing(12)
+
+        # App Logo
+        logo_label = QLabel()
+        logo_path = os.path.join(self.app_dir, "images", "logo.png")
+        if os.path.exists(logo_path):
+            pixmap = QPixmap(logo_path)
+            scaled_pixmap = pixmap.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            logo_label.setPixmap(scaled_pixmap)
+        header_layout.addWidget(logo_label)
         
         # App Title
         title_label = QLabel(APP_NAME)
-        title_label.setObjectName("titleLabel")
+        title_label.setObjectName("headerTitleLabel")
         header_layout.addWidget(title_label)
         
         header_layout.addStretch()
@@ -901,24 +911,26 @@ class TimerApp(QMainWindow):
         menu_layout = QHBoxLayout()
         menu_layout.setSpacing(8)
         
+        def create_header_button(icon_name, tooltip):
+            btn = QPushButton()
+            btn.setIcon(self.get_system_icon(icon_name))
+            btn.setToolTip(tooltip)
+            btn.setObjectName("menuButton")
+            btn.setFixedSize(40, 40)
+            return btn
+
         # Settings button
-        settings_btn = QPushButton("⚙️")
-        settings_btn.setObjectName("menuButton")
-        settings_btn.setToolTip("Settings")
+        settings_btn = create_header_button("settings", "Settings")
         settings_btn.clicked.connect(self.open_settings_modal)
         menu_layout.addWidget(settings_btn)
         
         # Help button
-        help_btn = QPushButton("❓")
-        help_btn.setObjectName("menuButton")
-        help_btn.setToolTip("Help & Guide")
+        help_btn = create_header_button("help", "Help & Guide")
         help_btn.clicked.connect(self.open_help_modal)
         menu_layout.addWidget(help_btn)
         
         # Info button
-        info_btn = QPushButton("ℹ️")
-        info_btn.setObjectName("menuButton")
-        info_btn.setToolTip("About TimeRing")
+        info_btn = create_header_button("info", "About TimeRing")
         info_btn.clicked.connect(self.open_info_modal)
         menu_layout.addWidget(info_btn)
         
@@ -926,7 +938,8 @@ class TimerApp(QMainWindow):
         main_layout.addWidget(header_widget)
         
         # Prominent Add Timer button - full width
-        self.add_timer_button = QPushButton("➕ Add Timer")
+        self.add_timer_button = QPushButton("Add Timer")
+        self.add_timer_button.setIcon(self.get_system_icon('add'))
         self.add_timer_button.setObjectName("addTimerButton")
         self.add_timer_button.clicked.connect(self.open_timer_creation_dialog)
         main_layout.addWidget(self.add_timer_button)
@@ -1069,7 +1082,8 @@ class TimerApp(QMainWindow):
             "is_ringing": False,
             "sound_path": timer_data["sound_path"],
             "description": timer_data["description"],
-            "is_paused": False
+            "is_paused": False,
+            "has_finished": False
         }
         
         self.timers.append(timer)
@@ -1115,6 +1129,7 @@ class TimerApp(QMainWindow):
         
         # Timer finished
         timer["is_ringing"] = True
+        timer["has_finished"] = True
         self.save_timers()
         
         # Send notification if enabled
@@ -1136,6 +1151,9 @@ class TimerApp(QMainWindow):
                 notification_text
             ])
         
+        # Mark as finished
+        timer["has_finished"] = True
+        
         # Play alarm sound in loop
         self.play_alarm(timer_index)
     
@@ -1144,7 +1162,7 @@ class TimerApp(QMainWindow):
             timer = self.timers[timer_index]
             
             # Don't pause if already completed
-            if timer["is_ringing"]:
+            if timer["is_ringing"] or timer.get("has_finished", False):
                 return
             
             # Toggle pause state
@@ -1156,74 +1174,148 @@ class TimerApp(QMainWindow):
             
             self.save_timers()
 
+    def rerun_timer(self, timer_index):
+        """Reruns a timer from its original duration."""
+        if timer_index < len(self.timers) and self.timers[timer_index]:
+            timer = self.timers[timer_index]
+            
+            # Reset timer properties
+            timer["remaining_seconds"] = timer["total_seconds"]
+            timer["is_paused"] = False
+            timer["is_ringing"] = False
+            timer["has_finished"] = False
+            
+            self.save_timers()
+            
+            # Stop any previous alarm thread for this timer
+            if timer_index in self.timer_threads and hasattr(self.timer_threads[timer_index], 'stop_event'):
+                self.timer_threads[timer_index].stop_event.set()
+
+            # Create a new threading event
+            self.timer_events[timer_index] = threading.Event()
+            
+            # Start a new timer thread
+            timer_thread = threading.Thread(
+                target=self.run_timer,
+                args=(timer_index,),
+                daemon=True
+            )
+            self.timer_threads[timer_index] = timer_thread
+            timer_thread.start()
+            
+            self.update_timers_display()
+
     def toggle_timer(self, timer_index):
         """Toggle timer pause/resume state"""
         if timer_index >= 0:
             self.pause_resume_timer(timer_index)
     
     def play_alarm(self, timer_index):
-        # Create new media player if one doesn't exist for this timer
-        if timer_index not in self.media_players:
-            self.media_players[timer_index] = vlc.MediaPlayer()
-            
-        # Get sound path from timer, fallback to default
-        sound_path = self.timers[timer_index].get("sound_path", "")
+        if timer_index >= len(self.timers) or self.timers[timer_index] is None:
+            return
+
+        timer = self.timers[timer_index]
+        sound_path = timer.get("sound_path", "")
         if not sound_path or not os.path.exists(sound_path):
-            # Use custom default if set, otherwise use built-in
             if self.settings.get("default_sound") and os.path.exists(self.settings["default_sound"]):
                 sound_path = self.settings["default_sound"]
             else:
                 sound_path = self.alarm_sound
-        
-        player = self.media_players[timer_index]
-        
-        # Create media from path
-        media = vlc.Media(sound_path)
-        
-        # Set up looping if enabled
-        if self.settings.get("loop_sound", True):
-            media.add_option('input-repeat=-1')
 
-        player.set_media(media)
+        # Stop any existing alarm thread for this timer
+        if timer_index in self.timer_threads and self.timer_threads[timer_index].is_alive():
+             if hasattr(self.timer_threads[timer_index], 'stop_event'):
+                self.timer_threads[timer_index].stop_event.set()
+
+        # Use a thread to play sound in a loop via subprocess
+        stop_event = threading.Event()
+        def sound_loop(path, event):
+            while not event.is_set():
+                try:
+                    # Use a short timeout to allow the loop to check the event
+                    subprocess.run(["play", "-q", path], timeout=2)
+                except subprocess.TimeoutExpired:
+                    continue # Continue loop if timeout expires
+                except FileNotFoundError:
+                    print("Error: 'play' command not found. Please install 'sox'.")
+                    break
+                except Exception as e:
+                    print(f"Error playing sound: {e}")
+                    break
         
-        # Start playback
-        player.play()
-    
+        alarm_thread = threading.Thread(target=sound_loop, args=(sound_path, stop_event), daemon=True)
+        alarm_thread.stop_event = stop_event
+        self.timer_threads[timer_index] = alarm_thread
+        alarm_thread.start()
+
     def stop_timer(self, timer_index):
-        if timer_index < len(self.timers):
+        if timer_index < len(self.timers) and self.timers[timer_index]:
             timer = self.timers[timer_index]
-            
-            # Stop alarm if ringing
-            if timer["is_ringing"] and timer_index in self.media_players:
-                self.media_players[timer_index].stop()
-                del self.media_players[timer_index]
-            
+
+            # Stop the alarm sound thread
+            if timer_index in self.timer_threads and hasattr(self.timer_threads[timer_index], 'stop_event'):
+                self.timer_threads[timer_index].stop_event.set()
+
             timer['is_ringing'] = False
-            timer['is_paused'] = True
-            
-            # Clean up thread resources
-            if timer_index in self.timer_events:
-                # Signal thread to exit if paused
-                if timer.get("is_paused", False):
-                    self.timer_events[timer_index].set()
-                del self.timer_events[timer_index]
-            
-            if timer_index in self.timer_threads:
-                del self.timer_threads[timer_index]
+            timer['is_paused'] = True  # Mark as stopped
+            timer['has_finished'] = True # Mark as finished
             
             self.save_timers()
-    
+            self.update_timers_display()
+
+    def delete_timer(self, timer_index):
+        """Delete a timer after confirmation."""
+        if timer_index < len(self.timers) and self.timers[timer_index]:
+            timer = self.timers[timer_index]
+            
+            reply = QMessageBox.question(self, 'Delete Timer', 
+                                           f"Are you sure you want to delete the timer '{timer['name']}'?",
+                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                # Stop the alarm sound thread if it's running
+                if timer_index in self.timer_threads and hasattr(self.timer_threads[timer_index], 'stop_event'):
+                    self.timer_threads[timer_index].stop_event.set()
+
+                # Perform a "soft delete" by setting the timer to None
+                self.timers[timer_index] = None
+                
+                # Clean up resources
+                if timer_index in self.media_players:
+                    self.media_players[timer_index].stop()
+                    del self.media_players[timer_index]
+                
+                # Use a more robust way to clean up thread-related resources
+                event = self.timer_events.pop(timer_index, None)
+                if event:
+                    event.set() # Signal waiting threads to exit
+
+                thread = self.timer_threads.pop(timer_index, None)
+                if thread and thread.is_alive():
+                    if hasattr(thread, 'stop_event'):
+                        thread.stop_event.set()
+
+                self.save_timers()
+                self.update_timers_display()
+
     def get_system_icon(self, icon_name):
         """Get system icon with fallback to Unicode"""
         try:
             # Try to get system icons first
             style = self.style()
             icon_map = {
-                'edit': style.standardIcon(style.SP_FileDialogDetailView),
+                'edit': style.standardIcon(style.SP_FileDialogDetailedView),
                 'sound': style.standardIcon(style.SP_MediaVolume),
                 'play': style.standardIcon(style.SP_MediaPlay),
                 'pause': style.standardIcon(style.SP_MediaPause),
                 'stop': style.standardIcon(style.SP_MediaStop),
+                'rerun': style.standardIcon(style.SP_BrowserReload),
+                'delete': style.standardIcon(style.SP_TrashIcon),
+                'stop_alarm': style.standardIcon(style.SP_MediaStop),
+                'settings': style.standardIcon(style.SP_ToolBarHorizontalExtensionButton),
+                'help': style.standardIcon(style.SP_DialogHelpButton),
+                'info': style.standardIcon(style.SP_MessageBoxInformation),
+                'add': style.standardIcon(style.SP_FileIcon),
             }
             
             if icon_name in icon_map and not icon_map[icon_name].isNull():
@@ -1231,9 +1323,40 @@ class TimerApp(QMainWindow):
         except:
             pass
         
-        # Fallback to Unicode symbols
+        # Fallback to Unicode symbols - REMOVED as per user request for no emojis
         return QIcon()
     
+    def rerun_timer(self, timer_index):
+        """Reruns a timer from its original duration."""
+        if timer_index < len(self.timers) and self.timers[timer_index]:
+            timer = self.timers[timer_index]
+            
+            # Reset timer properties
+            timer["remaining_seconds"] = timer["total_seconds"]
+            timer["is_paused"] = False
+            timer["is_ringing"] = False
+            timer["has_finished"] = False
+            
+            self.save_timers()
+            
+            # Stop any previous alarm thread for this timer
+            if timer_index in self.timer_threads and hasattr(self.timer_threads[timer_index], 'stop_event'):
+                self.timer_threads[timer_index].stop_event.set()
+
+            # Create a new threading event
+            self.timer_events[timer_index] = threading.Event()
+            
+            # Start a new timer thread
+            timer_thread = threading.Thread(
+                target=self.run_timer,
+                args=(timer_index,),
+                daemon=True
+            )
+            self.timer_threads[timer_index] = timer_thread
+            timer_thread.start()
+            
+            self.update_timers_display()
+
     def update_timers_display(self):
         # Update large timer display first
         self.update_large_timer_display()
@@ -1245,6 +1368,9 @@ class TimerApp(QMainWindow):
         apply_theme_to_widget(self.timers_list, is_dark)
         
         for i, timer in enumerate(self.timers):
+            if timer is None: # Skip soft-deleted timers
+                continue
+
             item = QListWidgetItem()
             widget = QWidget()
             widget.setProperty("timerCard", True)
@@ -1273,7 +1399,22 @@ class TimerApp(QMainWindow):
             hours, remainder = divmod(total_seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
             
-            if hours > 0:
+            if timer["is_ringing"]:
+                time_text = "Time's Up"
+            elif timer.get("has_finished", False):
+                original_total_seconds = timer["total_seconds"]
+                o_hours, o_rem = divmod(original_total_seconds, 3600)
+                o_minutes, o_seconds = divmod(o_rem, 60)
+                
+                duration_str = ""
+                if o_hours > 0:
+                    duration_str = f"{o_hours}h {o_minutes}m {o_seconds}s"
+                elif o_minutes > 0:
+                    duration_str = f"{o_minutes}m {o_seconds}s"
+                else:
+                    duration_str = f"{o_seconds}s"
+                time_text = f"Finished ({duration_str})"
+            elif hours > 0:
                 time_text = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
             else:
                 time_text = f"{minutes:02d}:{seconds:02d}"
@@ -1284,19 +1425,22 @@ class TimerApp(QMainWindow):
             
             # Status indicator
             if timer["is_ringing"]:
-                status_text = "RINGING"
-                status_style = "color: #ef4444; font-weight: 600; font-size: 11pt;"
+                status_text = "Ringing"
+                status_style = "color: #f59e0b; font-weight: 600; font-size: 11pt;" # Yellow color
+            elif timer.get("has_finished", False):
+                status_text = "Finished"
+                status_style = "color: #6b7280; font-weight: 600; font-size: 11pt;" # Gray color
             elif timer.get("is_paused", False):
-                status_text = "PAUSED"
+                status_text = "Paused"
                 status_style = "color: #f59e0b; font-weight: 600; font-size: 11pt;"
             else:
-                status_text = "RUNNING"
+                status_text = "Running"
                 status_style = "color: #10b981; font-weight: 600; font-size: 11pt;"
                 
             status_label = QLabel(status_text)
             status_label.setStyleSheet(status_style)
             time_status_layout.addWidget(status_label)
-            time_status_layout.addStretch()
+            time_status_layout.addStretch();
             
             info_container.addLayout(time_status_layout)
             
@@ -1312,59 +1456,60 @@ class TimerApp(QMainWindow):
             layout.addStretch()
             
             # Action buttons container
-            buttons_container = QVBoxLayout()
+            buttons_container = QHBoxLayout()
             buttons_container.setSpacing(8)
             
-            # Top row buttons
-            top_buttons = QHBoxLayout()
-            top_buttons.setSpacing(6)
-            
-            # Edit description button
-            edit_btn = QPushButton("Edit")
-            edit_btn.setToolTip("Edit Description")
-            edit_btn.setFixedSize(40, 40)
-            edit_btn.setObjectName("secondaryButton")
-            edit_btn.clicked.connect(lambda _, idx=i: self.edit_timer_description(idx))
-            top_buttons.addWidget(edit_btn)
-            
-            # Sound button
-            sound_btn = QPushButton("Sound")
-            sound_btn.setToolTip("Change Sound")
-            sound_btn.setFixedSize(40, 40)
-            sound_btn.setObjectName("secondaryButton")
-            sound_btn.clicked.connect(lambda _, idx=i: self.edit_timer_sound(idx))
-            top_buttons.addWidget(sound_btn)
-            
-            buttons_container.addLayout(top_buttons)
-            
-            # Bottom row buttons
-            bottom_buttons = QHBoxLayout()
-            bottom_buttons.setSpacing(6)
-            
-            # Pause/Resume button (only for active timers)
-            if not timer["is_ringing"]:
-                if timer.get("is_paused", False):
-                    control_btn = QPushButton("Resume")
-                    control_btn.setToolTip("Resume Timer")
-                    control_btn.setObjectName("successButton")
-                else:
-                    control_btn = QPushButton("Pause")
-                    control_btn.setToolTip("Pause Timer")
-                    control_btn.setObjectName("warningButton")
-                
-                control_btn.setFixedSize(40, 40)
-                control_btn.clicked.connect(lambda _, idx=i: self.pause_resume_timer(idx))
-                bottom_buttons.addWidget(control_btn)
-            
-            # Stop button
-            stop_btn = QPushButton("Stop")
-            stop_btn.setToolTip("Stop Timer")
-            stop_btn.setFixedSize(40, 40)
-            stop_btn.setObjectName("dangerButton")
-            stop_btn.clicked.connect(lambda _, idx=i: self.stop_timer(idx))
-            bottom_buttons.addWidget(stop_btn)
-            
-            buttons_container.addLayout(bottom_buttons)
+            # Consolidate button creation
+            def create_icon_button(icon_name, tooltip, object_name, on_click):
+                btn = QPushButton()
+                btn.setIcon(self.get_system_icon(icon_name))
+                btn.setToolTip(tooltip)
+                btn.setFixedSize(40, 40)
+                btn.setObjectName(object_name)
+                btn.clicked.connect(on_click)
+                return btn
+
+            # Edit description button - always visible
+            edit_btn = create_icon_button('edit', "Edit Description", "secondaryButton", lambda _, idx=i: self.edit_timer_description(idx))
+            buttons_container.addWidget(edit_btn)
+
+            # Sound button - always visible
+            sound_btn = create_icon_button('sound', "Change Sound", "secondaryButton", lambda _, idx=i: self.edit_timer_sound(idx))
+            buttons_container.addWidget(sound_btn)
+
+            # Pause/Resume/Rerun/Stop button
+            if timer["is_ringing"]:
+                # While ringing, show a stop alarm button
+                stop_alarm_btn = create_icon_button('stop_alarm', "Stop", "dangerButton", lambda _, idx=i: self.stop_timer(idx))
+                buttons_container.addWidget(stop_alarm_btn)
+            elif timer.get("has_finished", False):
+                # Rerun button for finished timers
+                rerun_btn = create_icon_button('rerun', "Rerun Timer", "successButton", lambda _, idx=i: self.rerun_timer(idx))
+                buttons_container.addWidget(rerun_btn)
+            elif timer.get("is_paused", False):
+                # Resume button
+                resume_btn = create_icon_button('play', "Resume Timer", "successButton", lambda _, idx=i: self.pause_resume_timer(idx))
+                buttons_container.addWidget(resume_btn)
+            else:  # Running
+                # Pause button
+                pause_btn = create_icon_button('pause', "Pause Timer", "warningButton", lambda _, idx=i: self.pause_resume_timer(idx))
+                buttons_container.addWidget(pause_btn)
+
+            # Stop/Delete button
+            if timer.get("is_paused", False) or timer.get("has_finished", False):
+                # Delete button for paused or finished timers
+                delete_btn = create_icon_button('delete', "Delete Timer", "dangerButton", lambda _, idx=i: self.delete_timer(idx))
+                buttons_container.addWidget(delete_btn)
+            elif timer["is_ringing"]:
+                 # Add a disabled placeholder to keep layout consistent
+                placeholder = QWidget()
+                placeholder.setFixedSize(40, 40)
+                buttons_container.addWidget(placeholder)
+            else: # Running
+                # Stop button for running timers (different from stop_alarm)
+                stop_btn = create_icon_button('stop', "Stop Timer", "dangerButton", lambda _, idx=i: self.stop_timer(idx))
+                buttons_container.addWidget(stop_btn)
+
             layout.addLayout(buttons_container)
             
             # Set size hint based on content
@@ -1375,8 +1520,10 @@ class TimerApp(QMainWindow):
     
     def save_timers(self):
         if self.settings.get("save_state", True):
+            # Filter out None values before saving
+            active_timers = [t for t in self.timers if t is not None]
             with open(self.state_file, "w") as f:
-                json.dump(self.timers, f)
+                json.dump(active_timers, f)
     
     def load_timers(self):
         if os.path.exists(self.state_file) and self.settings.get("auto_start_timers", True):
@@ -1385,12 +1532,19 @@ class TimerApp(QMainWindow):
                 
             # Restart any running timers
             for i, timer in enumerate(self.timers):
+                if timer is None:
+                    continue
+                
                 # Create threading event for each timer
                 self.timer_events[i] = threading.Event()
                 
+                # If timer has finished, do not restart it automatically
+                if timer.get("has_finished", False):
+                    continue
+
                 # Resume paused timers in paused state
                 if timer.get("is_paused", False):
-                    pass  # Keep it paused
+                    continue
                 elif timer["remaining_seconds"] > 0 and not timer["is_ringing"]:
                     # Start running timers
                     timer_thread = threading.Thread(
@@ -1424,7 +1578,7 @@ class TimerApp(QMainWindow):
                         if key not in settings:
                             settings[key] = value
                     return settings
-            except:
+            except Exception:
                 return default_settings
         else:
             return default_settings
@@ -1438,6 +1592,11 @@ class TimerApp(QMainWindow):
         for player in self.media_players.values():
             player.stop()
         
+        # Stop all alarm threads
+        for thread in self.timer_threads.values():
+            if hasattr(thread, 'stop_event'):
+                thread.stop_event.set()
+
         # Resume any paused threads so they can exit
         for i, timer_event in self.timer_events.items():
             timer_event.set()
@@ -1450,10 +1609,42 @@ class TimerApp(QMainWindow):
         
         event.accept()
 
+    def resizeEvent(self, event):
+        """Adjust font size based on window size."""
+        base_font_size = 10
+        width = self.width()
+        
+        if width < 600:
+            font_size = base_font_size * 0.9
+        elif width < 800:
+            font_size = base_font_size
+        else:
+            font_size = base_font_size * 1.1
+
+        font = self.font()
+        font.setPointSize(int(font_size))
+        self.setFont(font)
+        
+        # Update stylesheet to reflect font size changes for specific widgets
+        self.update_timers_display()
+        
+        # Adjust header title font size
+        try:
+            title_label = self.findChild(QLabel, "headerTitleLabel")
+            if title_label:
+                title_font = title_label.font()
+                title_font.setPointSize(int(font_size * 1.5))
+                title_label.setFont(title_font)
+        except AttributeError:
+            # This can happen if the widget is not found during shutdown
+            pass
+
+        super().resizeEvent(event)
+
     def get_primary_timer_index(self):
         """Get the index of the primary active timer (first running timer)"""
         for i, timer in enumerate(self.timers):
-            if not timer["is_ringing"] and timer["remaining_seconds"] > 0:
+            if timer and not timer["is_ringing"] and timer["remaining_seconds"] > 0:
                 return i
         return -1
 
@@ -1474,7 +1665,9 @@ class TimerApp(QMainWindow):
             minutes = (remaining % 3600) // 60
             seconds = remaining % 60
             
-            if hours > 0:
+            if timer["is_ringing"]:
+                time_text = "Time's Up"
+            elif hours > 0:
                 time_text = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
             else:
                 time_text = f"{minutes:02d}:{seconds:02d}"
@@ -1483,14 +1676,17 @@ class TimerApp(QMainWindow):
             
             # Update status and controls
             if timer["is_ringing"]:
-                self.large_timer_status.setText("ALARM!")
-                self.large_pause_button.setText("Stop Alarm")
+                self.large_timer_status.setText("Ringing")
+                self.large_pause_button.setText("Stop")
+                self.large_pause_button.setIcon(self.get_system_icon('stop_alarm'))
             elif timer.get("is_paused", False):
                 self.large_timer_status.setText("Paused")
                 self.large_pause_button.setText("Resume")
+                self.large_pause_button.setIcon(self.get_system_icon('play'))
             else:
                 self.large_timer_status.setText("Running")
                 self.large_pause_button.setText("Pause")
+                self.large_pause_button.setIcon(self.get_system_icon('pause'))
         else:
             self.active_timer_frame.setVisible(False)
         
@@ -1599,7 +1795,8 @@ class TimerCreationDialog(QDialog):
         
         # Description button
         description_layout = QHBoxLayout()
-        self.description_button = QPushButton("Add Description")
+        self.description_button = QPushButton(" Add Description")
+        self.description_button.setIcon(self.parent().get_system_icon('edit'))
         self.description_button.clicked.connect(self.add_description)
         description_layout.addWidget(self.description_button)
         
@@ -1610,7 +1807,8 @@ class TimerCreationDialog(QDialog):
         
         # Sound selection
         sound_layout = QHBoxLayout()
-        self.sound_button = QPushButton("Select Sound")
+        self.sound_button = QPushButton(" Select Sound")
+        self.sound_button.setIcon(self.parent().get_system_icon('sound'))
         self.sound_button.clicked.connect(self.select_sound)
         sound_layout.addWidget(self.sound_button)
         
@@ -1675,7 +1873,7 @@ class TimerCreationDialog(QDialog):
                 QMessageBox.warning(self, "Invalid Duration", "Please enter a duration greater than 0.")
                 return
                 
-        except ValueError as e:
+        except (ValueError, TypeError):
             QMessageBox.warning(self, "Invalid Input", "Please enter valid numbers for hours, minutes, and seconds.")
             return
         
@@ -1695,7 +1893,8 @@ class TimerCreationDialog(QDialog):
             "is_ringing": False,
             "sound_path": self.current_sound,
             "description": self.current_description,
-            "is_paused": False
+            "is_paused": False,
+            "has_finished": False
         }
 
 

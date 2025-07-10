@@ -1,47 +1,60 @@
-# TimeRing - Modern Desktop Timer Application
+# TimeRing - A Modern Desktop Timer Application
 
 <div align="center">
   <img src="images/logo.png" alt="TimeRing Logo" width="128" height="128">
   
-  **A lightweight, modern timer application for Linux desktop environments**
+  **A lightweight, modern, and beautiful timer application for your desktop.**
   
-  ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-  ![Python](https://img.shields.io/badge/python-3.13-green.svg)
-  ![License](https://img.shields.io/badge/license-MIT-green.svg)
-  ![Platform](https://img.shields.io/badge/platform-Linux-orange.svg)
+  [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Lusan-sapkota/TimeRing)
+  [![Python](https://img.shields.io/badge/python-3.7+-green.svg)](https://www.python.org/)
+  [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+  [![Platform](https://img.shields.io/badge/platform-Linux-orange.svg)](#platform-compatibility)
+  
+  [**View on GitHub**](https://github.com/Lusan-sapkota/TimeRing)
 </div>
+
+<!-- Optional: Add a screenshot or GIF of the application in action -->
+<!-- 
+<div align="center">
+  <img src="path/to/your/screenshot.png" alt="TimeRing Screenshot" width="700">
+</div>
+-->
+
+TimeRing is a versatile and user-friendly timer application designed to help you manage your time effectively. Whether you're working, studying, or cooking, TimeRing provides a clean and intuitive interface to run multiple timers at once. Built with PyQt5, it's designed with a focus on Linux but is architected to be cross-platform.
 
 ## ✨ Features
 
 ### 🎯 Core Functionality
-- **Multiple Concurrent Timers**: Run multiple timers simultaneously with different durations
-- **Custom Timer Names**: Personalize each timer with descriptive names
-- **Timer Descriptions**: Add detailed descriptions up to 200 words per timer
-- **Pause/Resume**: Full control over timer execution
-- **Persistent State**: Automatically saves and restores timer states across app restarts
+
+- **Multiple Concurrent Timers**: Run as many timers as you need simultaneously.
+- **Custom Timer Names & Descriptions**: Personalize each timer with a name and a detailed description.
+- **Pause, Resume, and Rerun**: Full control over the timer lifecycle, including the ability to rerun a finished timer instantly.
+- **Persistent State**: Automatically saves and restores your timers across application restarts.
 
 ### 🔊 Audio & Notifications
-- **Custom Notification Sounds**: Set different sounds for each timer or use a global default
-- **Sound Looping**: Continuous audio alerts until manually stopped
-- **Desktop Notifications**: Native KDE and GNOME notification integration
-- **Notification Urgency Levels**: Configure low, normal, or critical urgency
+
+- **Custom Notification Sounds**: Assign unique sounds for each timer or use a global default.
+- **Sound Looping**: Audio alerts play continuously until you stop them.
+- **Native Desktop Notifications**: Integrates with Linux desktop environments (like KDE and GNOME) to show system notifications.
+- **Configurable Urgency**: Set notification urgency to low, normal, or critical.
 
 ### 🎨 Modern User Interface
-- **Clean, Modern Design**: Flat design with soft rounded corners and hover effects
-- **Slide-in Drawer**: Accessible side panel with Settings, Help, and Info sections
-- **Responsive Layout**: Non-blocking UI with smooth animations
-- **Status Indicators**: Visual feedback for running, paused, and ringing timers
-- **Emoji Icons**: Intuitive emoji-based action buttons
+
+- **Clean, Modern Design**: A polished UI with a slide-in menu and smooth animations.
+- **System-Native Icons**: Uses icons from your system's theme for a consistent and native feel.
+- **Responsive Layout**: A non-blocking UI that stays responsive.
+- **Clear Status Indicators**: Visual feedback for running, paused, ringing, and finished timers.
 
 ### ⚙️ Advanced Features
-- **CLI Support**: Command-line arguments for automation and scripting
-- **External Styling**: Customizable appearance via CSS-like stylesheets
-- **Settings Management**: Comprehensive preferences for notifications, sounds, and behavior
-- **Auto-start**: Optional automatic timer restoration on application launch
+
+- **CLI Support**: Basic command-line arguments for automation.
+- **External Styling**: Customizable appearance via Qt's QSS stylesheets.
+- **Settings Management**: Configure default sounds, notifications, and application behavior.
 
 ## 📦 Installation
 
 ### Prerequisites
+
 ```bash
 # Ubuntu/Debian
 sudo apt update
@@ -55,326 +68,121 @@ sudo pacman -S python python-pip python-pyqt5 python-vlc
 ```
 
 ### Dependencies
-Install Python dependencies:
+
+Install the required Python packages using the `requirements.txt` file:
+
 ```bash
-pip3 install PyQt5 python-vlc
+pip3 install -r requirements.txt
 ```
 
 ### Quick Setup
-1. Clone or download the application:
-```bash
-git clone <repository-url> TimeRing
-cd TimeRing
-```
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/Lusan-sapkota/TimeRing.git
+    cd TimeRing
+    ```
 
 2. Ensure the directory structure is correct:
-```
-TimeRing/
-├── main.py
-├── style.qss
-├── requirements.txt
-├── README.md
-├── images/
-│   └── logo.png
-└── sounds/
-    └── timesup.mp3
-```
 
-3. Make the main script executable:
-```bash
-chmod +x main.py
-```
+    ```text
+    TimeRing/
+    ├── main.py
+    ├── style.qss
+    ├── requirements.txt
+    ├── README.md
+    ├── images/
+    │   └── logo.png
+    └── sounds/
+        └── timesup.mp3
+    ```
+
+3. Make the main script executable (optional):
+
+    ```bash
+    chmod +x main.py
+    ```
 
 4. Run the application:
-```bash
-python3 main.py
-```
+
+    ```bash
+    python3 main.py
+    ```
 
 ## 🚀 Usage
 
-### Basic Usage
+### Creating a Timer
 
-#### Creating a Timer
-1. Enter a descriptive name in the "Timer Name" field
-2. Set the duration in minutes in the "Duration" field
-3. Optionally add a description (📝 Add Description button)
-4. Optionally select a custom sound (🔊 Select Sound button)
-5. Click "🚀 Start Timer" to begin
+1. Enter a name for your timer.
+2. Set the duration in minutes.
+3. Optionally, click the **description icon** to add more details.
+4. Optionally, click the **sound icon** to select a custom alarm sound.
+5. Click **"Start Timer"** to begin.
 
-#### Managing Active Timers
-Each active timer displays:
-- **Timer name and remaining time**
-- **Status indicator** (▶️ Running, ⏸️ Paused, 🔔 Ringing)
-- **Description preview** (if available)
-- **Action buttons**:
-  - ✏️ Edit Description
-  - 🔊 Change Sound
-  - ⏸️/▶️ Pause/Resume
-  - 🛑 Stop Timer
+### Managing Active Timers
 
-### Command Line Interface
+Each active timer card displays its name, remaining time, and status. The action buttons change based on the timer's state:
 
-```bash
-# Show help
-python3 main.py --help
-
-# Show version information
-python3 main.py --version
-
-# Set default alarm sound
-python3 main.py --set-sound /path/to/custom/sound.mp3
-
-# Normal GUI launch
-python3 main.py
-```
+- **Running**: Pause, Stop, Edit Description, Change Sound.
+- **Paused**: Resume, Stop, Edit Description, Change Sound.
+- **Ringing**: A **Stop** button is shown to silence the alarm. The card turns yellow.
+- **Finished**: A **Rerun** button appears, allowing you to start the same timer again instantly.
 
 ### Menu Drawer
-Access the slide-in drawer by clicking the hamburger menu (☰) button:
 
-#### ⚙️ Settings Section
-- **📁 Change Default Sound**: Set global default notification sound
-- **🔧 Open Preferences**: Access comprehensive settings dialog
+Click the hamburger menu icon (☰) to access:
 
-#### ❓ Help Section
-- **Quick Start Guide**: Step-by-step usage instructions
-- **Feature Overview**: Detailed explanation of all features
-- **Tips & Tricks**: Advanced usage tips
+- **Settings**: Change the default sound and open the preferences dialog.
+- **Help**: Quick guides and feature overviews.
+- **About**: Information about the application.
 
-#### ℹ️ About Section
-- **Application Logo**: TimeRing branding
-- **Version Information**: Current app version
-- **Developer Credits**: Application author information
+## Platform Compatibility
 
-### Settings & Preferences
+This application is developed and tested primarily on **Linux**. Many features, especially those relying on system libraries like desktop notifications (`libnotify`) and audio (`VLC`), are tailored for a Linux environment.
 
-#### General Settings
-- **Auto-start timers**: Automatically resume timers on app launch
-- **Save timer state**: Persist timer information between sessions
-
-#### Notification Settings
-- **Show desktop notifications**: Enable/disable system notifications
-- **Include description**: Add timer descriptions to notifications
-- **Notification urgency**: Set priority level (Low/Normal/Critical)
-
-#### Sound Settings
-- **Default sound file**: Global notification sound
-- **Loop sound**: Continuous playback until stopped
-- **Sound preview**: Test audio before applying
+While it may run on **Windows** or **macOS** with Python and PyQt5 installed, some functionalities might not work as expected out-of-the-box. The notification system, in particular, would require platform-specific implementation to work on other operating systems.
 
 ## 🔧 Configuration
 
-### Configuration Directory
-TimeRing stores its configuration in:
-```
-~/.config/TimeRing/
-├── settings.json    # Application preferences
-└── timers.json      # Active timer states
-```
+TimeRing stores its configuration files in `~/.config/TimeRing/`:
 
-### Example Timer State Format
-```json
-[
-  {
-    "name": "Study Session",
-    "description": "Focus on math exercises for 45 minutes without distractions.",
-    "total_seconds": 2700,
-    "remaining_seconds": 1800,
-    "sound_path": "./sounds/timesup.mp3",
-    "is_ringing": false,
-    "is_paused": false
-  },
-  {
-    "name": "Break Time",
-    "description": "Take a short 10-minute break, stretch and relax.",
-    "total_seconds": 600,
-    "remaining_seconds": 0,
-    "sound_path": "/home/user/custom_sounds/bell.mp3",
-    "is_ringing": true,
-    "is_paused": false
-  }
-]
-```
-
-### Example Settings Format
-```json
-{
-  "auto_start_timers": true,
-  "save_state": true,
-  "show_notifications": true,
-  "include_description": true,
-  "notification_urgency": "Normal",
-  "default_sound": "/home/user/sounds/custom.mp3",
-  "loop_sound": true
-}
-```
+- `settings.json`: Application preferences.
+- `timers.json`: The state of all active timers.
 
 ## 🎨 Customization
 
-### Styling
-Modify `style.qss` to customize the application's appearance. The stylesheet uses standard Qt CSS syntax:
+You can customize the application's appearance by editing `style.qss`. This file uses standard Qt CSS syntax. For example, to change the primary button color:
 
 ```css
-/* Example: Change primary color */
-QPushButton {
-    background-color: #your-color;
+QPushButton#startButton {
+    background-color: #4CAF50; /* A nice green */
 }
-
-/* Example: Modify timer list appearance */
-QListWidget {
-    background-color: #your-background;
-    border-radius: 10px;
-}
-```
-
-### Sounds
-- Place custom sound files in the `sounds/` directory
-- Supported formats: MP3, WAV, OGG
-- Set as default through Settings or CLI
-
-### Icons
-Replace `images/logo.png` with your custom application icon (recommended: 512x512 PNG).
-
-## 📱 Desktop Integration
-
-### Creating a Desktop Entry
-Create `~/.local/share/applications/timering.desktop`:
-
-```desktop
-[Desktop Entry]
-Name=TimeRing
-Comment=Modern Desktop Timer Application
-Exec=/path/to/TimeRing/main.py
-Icon=/path/to/TimeRing/images/logo.png
-Terminal=false
-Type=Application
-Categories=Utility;Clock;
-StartupNotify=true
-```
-
-### System Installation
-For system-wide installation:
-
-1. Copy to system directories:
-```bash
-sudo cp -r TimeRing /opt/
-sudo ln -s /opt/TimeRing/main.py /usr/local/bin/timering
-sudo cp TimeRing/images/logo.png /usr/share/pixmaps/timering.png
-```
-
-2. Create system desktop entry:
-```bash
-sudo cp timering.desktop /usr/share/applications/
-```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### Sound not playing
-- Ensure VLC is installed: `sudo apt install vlc python3-vlc`
-- Check audio file permissions and formats
-- Verify PulseAudio/ALSA configuration
-
-#### Notifications not appearing
-- Install notification system: `sudo apt install libnotify-bin`
-- Check if notifications are enabled in desktop environment
-- Verify notification urgency settings
-
-#### Application won't start
-- Check Python and PyQt5 installation
-- Verify all dependencies are installed
-- Run with `python3 -v main.py` for verbose debugging
-
-#### Timer state not saving
-- Check write permissions to `~/.config/TimeRing/`
-- Ensure sufficient disk space
-- Verify JSON file integrity
-
-### Debug Mode
-Run with verbose output:
-```bash
-python3 -v main.py 2>&1 | tee debug.log
 ```
 
 ## 🤝 Contributing
 
-### Development Setup
-1. Fork the repository
-2. Create a feature branch
-3. Install development dependencies:
-```bash
-pip3 install -r requirements.txt
-```
-4. Make changes and test thoroughly
-5. Submit a pull request
+Contributions are welcome! If you'd like to improve TimeRing, please follow these steps:
 
-### Code Style
-- Follow PEP 8 Python style guidelines
-- Use descriptive variable and function names
-- Comment complex logic and algorithms
-- Maintain backward compatibility
+1. Fork the repository on GitHub.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and test them thoroughly.
+4. Submit a pull request to the `main` branch.
 
-### Testing
-Test on multiple desktop environments:
-- KDE Plasma
-- GNOME Shell
-- XFCE
-- Cinnamon
-
-## 📋 Requirements
-
-### System Requirements
-- **Operating System**: Linux (any distribution)
-- **Python**: 3.7 or higher (3.13 recommended)
-- **Desktop Environment**: KDE, GNOME, XFCE, or compatible
-- **Memory**: 50MB RAM minimum
-- **Storage**: 10MB disk space
-
-### Python Dependencies
-```txt
-PyQt5>=5.15.0
-python-vlc>=3.0.0
-```
+You can find the repository here: [https://github.com/Lusan-sapkota/TimeRing](https://github.com/Lusan-sapkota/TimeRing)
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## 👤 Author
 
-**Lusan Sapkota**
-- Developer and Maintainer
-- Contact: [Your contact information]
+Lusan Sapkota
 
-## 🙏 Acknowledgments
-
-- Qt Project for the excellent GUI framework
-- VLC Media Player for robust audio support
-- Linux desktop environment teams for notification standards
-- The Python community for comprehensive libraries
-
-## 🗺️ Roadmap
-
-### Version 1.1 (Planned)
-- [ ] System tray integration
-- [ ] Keyboard shortcuts
-- [ ] Timer templates
-- [ ] Export/import timer configurations
-
-### Version 1.2 (Future)
-- [ ] Multiple notification sound profiles
-- [ ] Timer categories and filtering
-- [ ] Statistics and usage tracking
-- [ ] Themes and advanced customization
-
-### Version 2.0 (Long-term)
-- [ ] Cloud synchronization
-- [ ] Mobile companion app
-- [ ] Team collaboration features
-- [ ] Plugin system
+- GitHub: [@Lusan-sapkota](https://github.com/Lusan-sapkota)
 
 ---
 
 <div align="center">
-  Made with ❤️ for the Linux community
+  Made with ❤️.
 </div>
