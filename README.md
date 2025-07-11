@@ -24,6 +24,8 @@ TimeRing is a versatile and user-friendly timer application designed to help you
 ### 🎯 Core Functionality
 
 - **Multiple Concurrent Timers**: Run as many timers as you need simultaneously.
+- **Priority Timer**: The most important timer is always displayed prominently and sorted to the top.
+- **Active Timer Block**: A large, dedicated display area for the currently active timer with enhanced controls.
 - **Custom Timer Names & Descriptions**: Personalize each timer with a name and a detailed description.
 - **Pause, Resume, and Rerun**: Full control over the timer lifecycle, including the ability to rerun a finished timer instantly.
 - **Persistent State**: Automatically saves and restores your timers across application restarts.

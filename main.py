@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QWidget,
                              QFrame, QScrollArea, QSizePolicy, QSpacerItem, QGridLayout,
                              QMessageBox, QDesktopWidget)
 from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, QRect, QEasingCurve, pyqtSignal, QSettings
-from PyQt5.QtGui import QIcon, QPixmap, QFont, QPalette, QPainter, QColor
+from PyQt5.QtGui import QIcon, QPixmap, QFont, QPalette, QPainter, QColor, QTransform
 from PyQt5.QtSvg import QSvgRenderer
 import vlc
 import requests
@@ -26,6 +26,32 @@ APP_NAME = "TimeRing"
 APP_VERSION = get_version()
 APP_DEVELOPER = "Lusan Sapkota"
 
+class TimerEditDialog(QDialog):
+    def __init__(self, name="", description="", parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Edit Timer")
+        self.setMinimumWidth(400)
+        is_dark = detect_system_theme()
+        apply_theme_to_widget(self, is_dark)
+        layout = QVBoxLayout(self)
+
+        name_label = QLabel("Timer Name:")
+        layout.addWidget(name_label)
+        self.name_edit = QLineEdit(name)
+        layout.addWidget(self.name_edit)
+
+        desc_label = QLabel("Description:")
+        layout.addWidget(desc_label)
+        self.description_edit = QTextEdit(description)
+        layout.addWidget(self.description_edit)
+
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        layout.addWidget(button_box)
+
+    def get_data(self):
+        return self.name_edit.text().strip(), self.description_edit.toPlainText().strip()
 
 def detect_system_theme():
     """Detect if the system is using dark theme"""
@@ -66,6 +92,15 @@ def detect_system_theme():
     
     return False  # Default to light theme
 
+def get_status_icon(self, status):
+    if status == "running":
+        return self.get_icon("status_running")
+    elif status == "paused":
+        return self.get_icon("status_paused")
+    elif status == "timesup":
+        return self.get_icon("status_timesup")
+    else:
+        return QIcon()  # fallback
 
 def apply_theme_to_widget(widget, is_dark=None):
     """Apply theme property to widget and its children"""
@@ -171,12 +206,12 @@ class SettingsModalDialog(QDialog):
         sound_buttons = QHBoxLayout()
         
         browse_btn = QPushButton("Browse Files")
-        browse_btn.setIcon(self.get_icon("folder"))
+        browse_btn.setIcon(self.parent_window.get_icon("folder"))
         browse_btn.clicked.connect(self.browse_sound)
         sound_buttons.addWidget(browse_btn)
         
         preview_btn = QPushButton("Preview")
-        preview_btn.setIcon(self.get_icon("play"))
+        preview_btn.setIcon(self.parent_window.get_icon("play"))
         preview_btn.clicked.connect(self.preview_sound)
         sound_buttons.addWidget(preview_btn)
         
@@ -210,7 +245,7 @@ class SettingsModalDialog(QDialog):
         
         # Advanced settings button
         advanced_btn = QPushButton("Advanced Settings")
-        advanced_btn.setIcon(self.get_icon("settings"))
+        advanced_btn.setIcon(self.parent_window.get_icon("settings"))
         advanced_btn.setObjectName("secondaryButton")
         advanced_btn.clicked.connect(self.open_advanced_settings)
         layout.addWidget(advanced_btn)
@@ -225,17 +260,7 @@ class SettingsModalDialog(QDialog):
         
         # Media player for preview
         self.preview_player = vlc.MediaPlayer()
-        
-    def get_icon(self, name):
-        """Get icon by name from bundled icons with theme support"""
-        icon_path = os.path.join(self.parent_window.app_dir, "images", "icons", f"{name}.svg")
-        
-        # Determine icon color based on theme
-        is_dark = detect_system_theme()
-        icon_color = "#ffffff" if is_dark else "#374151"  # White for dark theme, dark gray for light
-        
-        return load_svg_icon(icon_path, icon_color, 24)
-    
+
     def browse_sound(self):
         """Browse for sound file"""
         file_dialog = QFileDialog(self)
@@ -361,7 +386,7 @@ class HelpModalDialog(QDialog):
 
 <p><strong>Timer Control Actions:</strong></p>
 <ul>
-<li><strong>Edit Description:</strong> Modify the timer's descriptive text</li>
+<li><strong>Edit Description:</strong> Modify the timer's title and descriptive text</li>
 <li><strong>Change Sound:</strong> Select a different notification sound</li>
 <li><strong>Pause/Resume:</strong> Temporarily stop or continue the countdown</li>
 <li><strong>Rerun:</strong> Restart the timer from its original duration</li>
@@ -1170,6 +1195,19 @@ class TimerApp(QMainWindow):
         
         # Prominent Add Timer button - full width
         self.add_timer_button = QPushButton("Add Timer")
+        self.add_timer_button.setStyleSheet("""
+            QPushButton {
+            background-color: #22c55e;  /* medium green */
+            color: #ffffff;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 12px 0;
+            font-size: 18px;
+            }
+            QPushButton:hover {
+            background-color: #16a34a;  /* darker green on hover */
+            }
+        """)
         self.add_timer_button.setIcon(self.get_icon('add'))
         self.add_timer_button.setObjectName("addTimerButton")
         self.add_timer_button.clicked.connect(self.open_timer_creation_dialog)
@@ -1202,18 +1240,23 @@ class TimerApp(QMainWindow):
         self.large_timer_time.setObjectName("largeTimerDisplay")
         self.large_timer_time.setAlignment(Qt.AlignCenter)
         active_timer_layout.addWidget(self.large_timer_time)
-        
+
         self.large_timer_status = QLabel("Running")
         self.large_timer_status.setObjectName("statusLabel")
         self.large_timer_status.setAlignment(Qt.AlignCenter)
-        active_timer_layout.addWidget(self.large_timer_status)
+        self.large_timer_status.setAlignment(Qt.AlignCenter)
         
         # Large timer controls
         large_timer_controls = QHBoxLayout()
         
         # Previous timer button
+        prev_icon = self.get_icon("play")
+        pixmap = prev_icon.pixmap(24, 24)
+        transform = QTransform().rotate(180)
+        rotated_pixmap = pixmap.transformed(transform, Qt.SmoothTransformation)
+        rotated_icon = QIcon(rotated_pixmap)
         self.large_prev_button = QPushButton("Previous")
-        self.large_prev_button.setIcon(self.get_icon("play"))  # We'll rotate this icon
+        self.large_prev_button.setIcon(rotated_icon)  # Set rotated icon
         self.large_prev_button.setObjectName("secondaryButton")
         self.large_prev_button.setToolTip("Switch to Previous Timer")
         self.large_prev_button.clicked.connect(self.switch_to_previous_timer)
@@ -1244,7 +1287,7 @@ class TimerApp(QMainWindow):
         main_layout.addWidget(self.active_timer_frame)
 
         # Placeholder for empty active timer area (separate from the frame)
-        self.active_timer_placeholder = QLabel("⏱️ No Active Timer\n\nCreate a new timer to see it here\nYour timer will appear with a large, easy-to-read display")
+        self.active_timer_placeholder = QLabel("No Active Timer\n\nCreate a new timer to see it here\nYour timer will appear with a large, easy-to-read display")
         self.active_timer_placeholder.setObjectName("activeTimerPlaceholder")
         self.active_timer_placeholder.setAlignment(Qt.AlignCenter)
         self.active_timer_placeholder.setVisible(True)  # Initially visible when no timers
@@ -1260,16 +1303,49 @@ class TimerApp(QMainWindow):
         self.timers_list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.timers_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.timers_list.setResizeMode(QListWidget.Adjust)
-        
-        # Fix scrolling issues with custom widgets
+        self.timers_list.setVerticalScrollMode(QListWidget.ScrollPerPixel)  # <--- Ensure per-pixel scroll
+        self.timers_list.setMovement(QListWidget.Static)
+        self.timers_list.setFlow(QListWidget.TopToBottom)
+        self.timers_list.setWrapping(False)
+        self.timers_list.setSelectionMode(QListWidget.NoSelection)
+        self.timers_list.setFocusPolicy(Qt.NoFocus)
+        self.timers_list.setUniformItemSizes(False)  # <--- Important for smooth pixel scroll
+
+        # Fix mouse wheel scroll jumps by subclassing and overriding wheelEvent
+        class SmoothScrollList(QListWidget):
+            def wheelEvent(self, event):
+                # Use pixelDelta if available for smooth scrolling
+                if event.pixelDelta().y() != 0:
+                    self.verticalScrollBar().setValue(
+                        self.verticalScrollBar().value() - event.pixelDelta().y()
+                    )
+                else:
+                    super().wheelEvent(event)
+
+        # Replace timers_list with smooth scroll subclass
+        self.timers_list = SmoothScrollList()
+        # Reapply all settings to new instance
+        self.timers_list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.timers_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.timers_list.setResizeMode(QListWidget.Adjust)
         self.timers_list.setVerticalScrollMode(QListWidget.ScrollPerPixel)
         self.timers_list.setMovement(QListWidget.Static)
         self.timers_list.setFlow(QListWidget.TopToBottom)
         self.timers_list.setWrapping(False)
         self.timers_list.setSelectionMode(QListWidget.NoSelection)
         self.timers_list.setFocusPolicy(Qt.NoFocus)
-        
+        self.timers_list.setUniformItemSizes(False)
+
         main_layout.addWidget(self.timers_list)
+
+        self.large_timer_status_row = QHBoxLayout()
+        self.large_status_icon = QLabel()
+        self.large_status_icon.setFixedSize(28, 28)
+        self.large_timer_status_row.addStretch()
+        self.large_timer_status_row.addWidget(self.large_status_icon)
+        self.large_timer_status_row.addWidget(self.large_timer_status)
+        self.large_timer_status_row.addStretch()
+        active_timer_layout.addLayout(self.large_timer_status_row)
         
         # Apply initial screen size
         self.setProperty("screenSize", "medium")  # Default
@@ -1278,46 +1354,51 @@ class TimerApp(QMainWindow):
         self.current_description = ""
         self.current_sound = ""
 
+        for btn in self.findChildren(QPushButton):
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
+
     def create_timer_card(self, timer, timer_index):
         """Creates a widget for a single timer card."""
         card_widget = QWidget()
         card_layout = QGridLayout(card_widget)
         card_widget.setObjectName("timerCard")
-        
+
         # Set proper size policy for consistent sizing
         card_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        
+
         # Adjust minimum height based on compact mode
         is_compact = self.property("compactMode")
         if is_compact:
             card_widget.setMinimumHeight(100)
         else:
             card_widget.setMinimumHeight(120)
-        
-        # Set status property for CSS styling
-        if timer["is_ringing"]:
-            card_widget.setProperty("status", "ringing")
-        elif timer.get("has_finished", False):
-            card_widget.setProperty("status", "finished")
-        elif timer.get("is_paused", False):
-            card_widget.setProperty("status", "paused")
-        else:
-            card_widget.setProperty("status", "running")
 
-        # Timer name with priority indicator
-        name_text = timer["name"]
+        # --- Always show timer name and icon ---
+        name_layout = QHBoxLayout()
+        name_layout.setSpacing(8)
+
+        icon_label = QLabel()
+        icon_label.setFixedSize(24, 24)
         if timer["is_ringing"]:
-            name_text = f"🔔 {name_text}"
-        elif not timer.get("has_finished", False) and not timer.get("is_paused", False):
-            name_text = f"▶️ {name_text}"
+            icon_label.setPixmap(self.get_icon("bell").pixmap(24, 24))
+        elif timer.get("has_finished", False):
+            icon_label.setPixmap(self.get_icon("alarm").pixmap(24, 24))
         elif timer.get("is_paused", False):
-            name_text = f"⏸️ {name_text}"
+            icon_label.setPixmap(self.get_icon("pause").pixmap(24, 24))
         else:
-            name_text = f"⏰ {name_text}"
-            
-        name_label = QLabel(name_text)
+            icon_label.setPixmap(self.get_icon("play").pixmap(24, 24))
+
+        icon_label.setObjectName("timerIcon")
+        name_label = QLabel(timer["name"])
         name_label.setObjectName("timerName")
-        card_layout.addWidget(name_label, 0, 0, 1, 4)
+        name_label.style().unpolish(name_label)
+        name_label.style().polish(name_label)
+        name_layout.addWidget(icon_label)
+        name_layout.addWidget(name_label)
+        name_layout.addStretch()
+
+        card_layout.addLayout(name_layout, 0, 0, 1, 4)
 
         # Timer description
         if timer.get("description"):
@@ -1327,82 +1408,128 @@ class TimerApp(QMainWindow):
             card_layout.addWidget(description_label, 1, 0, 1, 4)
 
         # Time display
-        time_label = QLabel(self.format_time(timer["remaining_seconds"]))
+        elapsed_formatted = self.format_time(timer["total_seconds"])
+        time_label = QLabel(f"{self.format_time(timer['remaining_seconds'])} | {elapsed_formatted}")
         time_label.setObjectName("timerTime")
+        time_label.setMaximumWidth(400)  # Limit width to keep it compact
+        time_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         card_layout.addWidget(time_label, 2, 0, 1, 2)
 
-        # Status display
+        # Status icon + label
+        status_row = QHBoxLayout()
+        status_icon_label = QLabel()
+        status_icon_label.setFixedSize(24, 24)
+        status_icon_label.setObjectName("statusIcon")
         status_label = QLabel()
         status_label.setObjectName("timerStatus")
-        card_layout.addWidget(status_label, 2, 2, 1, 2)
+        status_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        status_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+
+        if timer["is_ringing"]:
+            status_icon_label.setPixmap(self.get_icon("bell").pixmap(24, 24))
+            status_label.setText("Ringing!")
+            status_label.setStyleSheet("color: #ef4444; font-weight: bold; ")
+        elif timer.get("has_finished", False):
+            status_icon_label.setPixmap(self.get_icon("alarm").pixmap(24, 24))
+            status_label.setText("Time's Up!")
+            status_label.setStyleSheet("color: #ef4444; font-weight: bold;")
+        elif timer.get("is_paused", False):
+            status_icon_label.setPixmap(self.get_icon("pause").pixmap(24, 24))
+            status_label.setText("Paused")
+            status_label.setStyleSheet("color: #f59e0b; font-weight: 500;")
+        else:
+            status_icon_label.setPixmap(self.get_icon("play").pixmap(24, 24))
+            status_label.setText("Running")
+            status_label.setStyleSheet("color: #10b981; font-weight: 500;")
+
+        status_row.addWidget(status_icon_label)
+        status_row.addWidget(status_label)
+        status_row.addStretch()
+        card_layout.addLayout(status_row, 2, 2, 1, 2)
 
         # Buttons
         buttons_layout = QHBoxLayout()
         buttons_layout.setSpacing(8)
         buttons_layout.setContentsMargins(0, 12, 0, 0)
-        
+
         edit_btn = QPushButton()
         edit_btn.setIcon(self.get_icon("edit"))
         edit_btn.setToolTip("Edit Description")
+        edit_btn.style().unpolish(edit_btn)
+        edit_btn.style().polish(edit_btn)
         edit_btn.clicked.connect(lambda: self.edit_timer_description(timer_index))
         buttons_layout.addWidget(edit_btn)
 
         sound_btn = QPushButton()
         sound_btn.setIcon(self.get_icon("sound"))
         sound_btn.setToolTip("Change Sound")
+        sound_btn.style().unpolish(sound_btn)
+        sound_btn.style().polish(sound_btn)
         sound_btn.clicked.connect(lambda: self.edit_timer_sound(timer_index))
         buttons_layout.addWidget(sound_btn)
 
         rerun_btn = QPushButton()
         rerun_btn.setIcon(self.get_icon("rerun"))
         rerun_btn.setToolTip("Rerun Timer")
+        rerun_btn.style().unpolish(rerun_btn)
+        rerun_btn.style().polish(rerun_btn)
         rerun_btn.clicked.connect(lambda: self.rerun_timer(timer_index))
         buttons_layout.addWidget(rerun_btn)
 
         pause_btn = QPushButton()
         pause_btn.setIcon(self.get_icon("play")) # Icon changes based on state
         pause_btn.setToolTip("Pause/Resume")
+        pause_btn.style().unpolish(pause_btn)
+        pause_btn.style().polish(pause_btn)
         pause_btn.clicked.connect(lambda: self.toggle_timer(timer_index))
         buttons_layout.addWidget(pause_btn)
 
         stop_btn = QPushButton()
         stop_btn.setIcon(self.get_icon("stop"))
         stop_btn.setToolTip("Stop Timer")
+        stop_btn.style().unpolish(stop_btn)
+        stop_btn.style().polish(stop_btn)
         stop_btn.clicked.connect(lambda: self.stop_timer(timer_index))
         buttons_layout.addWidget(stop_btn)
 
         delete_btn = QPushButton()
         delete_btn.setIcon(self.get_icon("delete"))
         delete_btn.setToolTip("Delete Timer")
+        delete_btn.style().unpolish(delete_btn)
+        delete_btn.style().polish(delete_btn)
         delete_btn.clicked.connect(lambda: self.delete_timer(timer_index))
         buttons_layout.addWidget(delete_btn)
 
         card_layout.addLayout(buttons_layout, 3, 0, 1, 4)
 
-        # Update status with consistent colors and correct ringing display
+        # Now update status and pause_btn state
         if timer["is_ringing"]:
-            status_label.setText("🔔 Ringing!")
-            status_label.setStyleSheet("color: #ef4444; font-weight: bold; ")  # Red for ringing with emphasis
+            card_widget.setProperty("status", "ringing")
+            status_label.setText("Ringing!")
+            status_label.setStyleSheet("color: #ef4444; font-weight: bold; ")
             pause_btn.setEnabled(False)
-            pause_btn.setStyleSheet("opacity: 0.5; background-color: #6b7280;")  # Disabled style
+            pause_btn.setStyleSheet("opacity: 0.5; background-color: #6b7280;")
         elif timer.get("has_finished", False):
-            status_label.setText("⏰ Time's Up!")
-            status_label.setStyleSheet("color: #ef4444; font-weight: bold;")  # Red for finished (consistent)
+            card_widget.setProperty("status", "ringing")  # treat finished as ringing for style
+            status_label.setText("Time's Up!")
+            status_label.setStyleSheet("color: #ef4444; font-weight: bold;")
             pause_btn.setIcon(self.get_icon("play"))
             pause_btn.setEnabled(False)
-            pause_btn.setStyleSheet("opacity: 0.5; background-color: #6b7280;")  # Disabled style
+            pause_btn.setStyleSheet("opacity: 0.5; background-color: #6b7280;")
         elif timer.get("is_paused", False):
-            status_label.setText("⏸️ Paused")
-            status_label.setStyleSheet("color: #f59e0b; font-weight: 500;")  # Orange for paused
+            card_widget.setProperty("status", "paused")
+            status_label.setText("Paused")
+            status_label.setStyleSheet("")
             pause_btn.setIcon(self.get_icon("play"))
             pause_btn.setEnabled(True)
-            pause_btn.setStyleSheet("")  # Reset to default style
+            pause_btn.setStyleSheet("")
         else:
-            status_label.setText("▶️ Running")
-            status_label.setStyleSheet("color: #10b981; font-weight: 500;")  # Green for running
+            card_widget.setProperty("status", "running")
+            status_label.setText("Running")
+            status_label.setStyleSheet("")
             pause_btn.setIcon(self.get_icon("pause"))
             pause_btn.setEnabled(True)
-            pause_btn.setStyleSheet("")  # Reset to default style
+            pause_btn.setStyleSheet("")
 
         # Force style refresh to apply new properties
         card_widget.style().unpolish(card_widget)
@@ -1462,10 +1589,14 @@ class TimerApp(QMainWindow):
     def edit_timer_description(self, timer_index):
         if timer_index < len(self.timers):
             timer = self.timers[timer_index]
-            dialog = TimerDescriptionDialog(timer.get("description", ""), self)
+            dialog = TimerEditDialog(timer.get("name", ""), timer.get("description", ""), self)
             if dialog.exec_() == QDialog.Accepted:
-                timer["description"] = dialog.get_description()
-                self.save_timers()
+                new_name, new_desc = dialog.get_data()
+                timer["name"] = new_name
+                timer["description"] = new_desc
+                self.save_timers(force=True)
+                self.rebuild_timers_list()
+                self.update_large_timer_display()
     
     def edit_timer_sound(self, timer_index):
         if timer_index < len(self.timers):
@@ -1482,11 +1613,8 @@ class TimerApp(QMainWindow):
                     self.play_alarm(timer_index)
     
     def add_timer(self, timer_data):
-        """Adds a new timer to the application"""
-        
         import time
         current_time = time.time()
-        
         timer = {
             "name": timer_data["name"],
             "total_seconds": timer_data["total_seconds"],
@@ -1498,17 +1626,17 @@ class TimerApp(QMainWindow):
             "sound_path": timer_data["sound_path"],
             "description": timer_data["description"],
             "is_paused": False,
-            "has_finished": False
+            "has_finished": False,
+            "last_interaction": current_time  # <--- Track last interaction
         }
-        
-        self.timers.append(timer)
+        self.timers.insert(0, timer)
+        self.current_primary_timer_index = 0  # <--- New timer is always the active timer
         self.save_timers()
         
         # Create a threading event for this timer
-        timer_index = len(self.timers) - 1
+        timer_index = 0
         self.timer_events[timer_index] = threading.Event()
-        
-        # Start timer thread
+
         timer_thread = threading.Thread(
             target=self.run_timer,
             args=(timer_index,),
@@ -1599,17 +1727,31 @@ class TimerApp(QMainWindow):
                     timer["total_paused_duration"] += pause_duration
                     timer["pause_time"] = None
                 timer["is_paused"] = False
-                
-                # Signal the thread to continue
+
+                # --- Always signal the event to resume the thread ---
                 if timer_index in self.timer_events:
                     self.timer_events[timer_index].set()
+
+                # --- Start a new thread only if needed ---
+                if timer_index not in self.timer_threads or not self.timer_threads[timer_index].is_alive():
+                    timer_thread = threading.Thread(
+                        target=self.run_timer,
+                        args=(timer_index,),
+                        daemon=True
+                    )
+                    self.timer_threads[timer_index] = timer_thread
+                    timer_thread.start()
             else:
                 # Pausing: record the pause time
                 timer["pause_time"] = current_time
                 timer["is_paused"] = True
-            
-            self.save_timers(force=True)
 
+            timer["last_interaction"] = time.time()
+            self.current_primary_timer_index = timer_index
+            self.save_timers(force=True)
+            self.update_timers_display()
+
+    
     def rerun_timer(self, timer_index):
         """Reruns a timer from its original duration."""
         if timer_index < len(self.timers) and self.timers[timer_index]:
@@ -1641,8 +1783,10 @@ class TimerApp(QMainWindow):
             timer["is_ringing"] = False
             timer["has_finished"] = False
             
+            timer["last_interaction"] = current_time
+            self.current_primary_timer_index = timer_index  # <--- Make this the active timer
             self.save_timers(force=True)
-            
+
             # Stop any previous alarm thread for this timer
             if timer_index in self.timer_threads and hasattr(self.timer_threads[timer_index], 'stop_event'):
                 self.timer_threads[timer_index].stop_event.set()
@@ -1672,11 +1816,13 @@ class TimerApp(QMainWindow):
 
         timer = self.timers[timer_index]
         sound_path = timer.get("sound_path", "")
-        if not sound_path or not os.path.exists(sound_path):
-            if self.settings.get("default_sound") and os.path.exists(self.settings["default_sound"]):
-                sound_path = self.settings["default_sound"]
-            else:
-                sound_path = self.alarm_sound
+        # Use per-timer sound if set and exists
+        if sound_path and os.path.exists(sound_path):
+            pass  # Use this sound
+        elif self.settings.get("default_sound") and os.path.exists(self.settings["default_sound"]):
+            sound_path = self.settings["default_sound"]
+        else:
+            sound_path = self.alarm_sound
 
         # Stop any existing alarm thread for this timer
         if timer_index in self.timer_threads and self.timer_threads[timer_index].is_alive():
@@ -1716,6 +1862,7 @@ class TimerApp(QMainWindow):
             timer['is_paused'] = True  # Mark as stopped
             timer['has_finished'] = True # Mark as finished
             
+            timer['last_interaction'] = time.time()  # <--- Update interaction timestamp
             self.save_timers()
             self.update_timers_display()
 
@@ -1812,16 +1959,22 @@ class TimerApp(QMainWindow):
 
     def update_timers_display(self):
         """Update the list of timers and the large display."""
-        
         # Update the large timer display
         self.update_large_timer_display()
 
-        # Check if we need to rebuild the list (timer count changed)
+        # Get current timer count and sorted order
         current_timer_count = len([t for t in self.timers if t is not None])
-        
-        # Always rebuild to maintain proper priority ordering
-        self.last_timer_count = current_timer_count
-        self.rebuild_timers_list()
+        sorted_timer_pairs = self.sort_timers_by_priority()
+        current_sorted_indices = [i for _, i in sorted_timer_pairs]
+
+        # Only rebuild if timer count or order changed
+        if not hasattr(self, "_last_sorted_indices") or \
+           self.last_timer_count != current_timer_count or \
+           self._last_sorted_indices != current_sorted_indices:
+            self.last_timer_count = current_timer_count
+            self._last_sorted_indices = current_sorted_indices
+            self.rebuild_timers_list()
+        # Otherwise, just update labels (handled by update_timer_labels_timer)
 
     def get_timer_priority(self, timer):
         """Get priority for timer sorting (lower number = higher priority)"""
@@ -1835,14 +1988,11 @@ class TimerApp(QMainWindow):
             return 3  # Finished timers (lowest priority)
 
     def sort_timers_by_priority(self):
-        """Sort timers by priority: ringing > running > paused > finished"""
-        # Create list of (timer, original_index) tuples
+        """Sort timers by priority and last interaction (most recent first)"""
         timer_pairs = [(timer, i) for i, timer in enumerate(self.timers) if timer is not None]
-        
-        # Sort by priority, then by remaining time (descending for active timers)
         timer_pairs.sort(key=lambda x: (
             self.get_timer_priority(x[0]),
-            -x[0]["remaining_seconds"] if self.get_timer_priority(x[0]) <= 1 else x[0]["remaining_seconds"]
+            -x[0].get("last_interaction", 0)  # <--- Sort by most recent interaction
         ))
         return timer_pairs
     
@@ -1861,7 +2011,10 @@ class TimerApp(QMainWindow):
         for timer, original_index in sorted_timer_pairs:
             item = QListWidgetItem(self.timers_list)
             card_widget, time_label, status_label, pause_btn = self.create_timer_card(timer, original_index)
-            
+            # Retrieve icon_label and status_icon_label from the timer card's children
+            icon_label = card_widget.findChild(QLabel, "timerIcon")
+            status_icon_label = card_widget.findChild(QLabel, "statusIcon")
+
             # Ensure proper sizing for smooth scrolling
             card_widget.adjustSize()
             card_widget.updateGeometry()
@@ -1878,14 +2031,15 @@ class TimerApp(QMainWindow):
             timer["ui_widgets"] = {
                 "time_label": time_label,
                 "status_label": status_label,
-                "pause_btn": pause_btn
+                "pause_btn": pause_btn,
+                "icon_label": icon_label,
+                "status_icon_label": status_icon_label
             }
 
         # Process pending events to ensure proper layout
         QApplication.processEvents()
         
-        # Use QTimer to restore scroll position after a brief delay
-        # This ensures the layout is fully updated before restoring position
+        # Restore scroll position after layout update
         QTimer.singleShot(10, lambda: self.restore_scroll_position(current_scroll_position))
 
     def restore_scroll_position(self, position):
@@ -1901,45 +2055,61 @@ class TimerApp(QMainWindow):
                 ui_widgets = timer["ui_widgets"]
                 if "time_label" in ui_widgets and ui_widgets["time_label"]:
                     try:
-                        ui_widgets["time_label"].setText(self.format_time(timer["remaining_seconds"]))
-                        
+                        # Always show remaining | original
+                        ui_widgets["time_label"].setText(
+                            f"{self.format_time(timer['remaining_seconds'])} | {self.format_time(timer['total_seconds'])}"
+                            )
                         # Update status label with consistent colors and correct ringing display
                         if "status_label" in ui_widgets and ui_widgets["status_label"]:
+                            status_label = ui_widgets["status_label"]
+                            status_icon_label = None
+
                             if timer.get("is_ringing", False):
-                                ui_widgets["status_label"].setText("🔔 Ringing!")
-                                ui_widgets["status_label"].setStyleSheet("color: #ef4444; font-weight: bold;")  # Red for ringing
+                                status_label.setText("Ringing!")
+                                status_label.setStyleSheet("color: #ef4444; font-weight: bold;")
+                                if "status_icon_label" in ui_widgets and ui_widgets["status_icon_label"]:
+                                    ui_widgets["status_icon_label"].setPixmap(self.get_icon("bell").pixmap(24, 24))
+                                if "icon_label" in ui_widgets and ui_widgets["icon_label"]:
+                                    ui_widgets["icon_label"].setPixmap(self.get_icon("bell").pixmap(24, 24))
                             elif timer.get("has_finished", False):
-                                ui_widgets["status_label"].setText("⏰ Time's Up!")
-                                ui_widgets["status_label"].setStyleSheet("color: #ef4444; font-weight: bold;")  # Red for finished (consistent)
+                                status_label.setText("Time's Up!")
+                                status_label.setStyleSheet("color: #ef4444; font-weight: bold;")
+                                if "status_icon_label" in ui_widgets and ui_widgets["status_icon_label"]:
+                                    ui_widgets["status_icon_label"].setPixmap(self.get_icon("alarm").pixmap(24, 24))
+                                if "icon_label" in ui_widgets and ui_widgets["icon_label"]:
+                                    ui_widgets["icon_label"].setPixmap(self.get_icon("alarm").pixmap(24, 24))
                             elif timer.get("is_paused", False):
-                                ui_widgets["status_label"].setText("⏸️ Paused")
-                                ui_widgets["status_label"].setStyleSheet("color: #f59e0b; font-weight: 500;")  # Orange for paused
+                                status_label.setText("Paused")
+                                status_label.setStyleSheet("color: #f59e0b; font-weight: 500;")
+                                if "pause_btn" in ui_widgets and ui_widgets["pause_btn"]:
+                                    pause_btn = ui_widgets["pause_btn"]
+                                    if timer.get("is_ringing", False) or timer.get("has_finished", False):
+                                        pause_btn.setIcon(self.get_icon("play"))
+                                        pause_btn.setEnabled(False)
+                                        pause_btn.setStyleSheet("opacity: 0.5; background-color: #6b7280;")
+                                    elif timer.get("is_paused", False):
+                                        pause_btn.setIcon(self.get_icon("play"))
+                                        pause_btn.setEnabled(True)
+                                        pause_btn.setStyleSheet("")
+                                    else:
+                                        pause_btn.setIcon(self.get_icon("pause"))
+                                        pause_btn.setEnabled(True)
+                                        pause_btn.setStyleSheet("")
                             elif timer["remaining_seconds"] > 0:
-                                ui_widgets["status_label"].setText("▶️ Running")
-                                ui_widgets["status_label"].setStyleSheet("color: #10b981; font-weight: 500;")  # Green for running
+                                status_label.setText("Running")
+                                status_label.setStyleSheet("color: #10b981; font-weight: 500;")
+                                if "status_icon_label" in ui_widgets and ui_widgets["status_icon_label"]:
+                                    ui_widgets["status_icon_label"].setPixmap(self.get_icon("play").pixmap(24, 24))
+                                if "icon_label" in ui_widgets and ui_widgets["icon_label"]:
+                                    ui_widgets["icon_label"].setPixmap(self.get_icon("play").pixmap(24, 24))
                             else:
-                                ui_widgets["status_label"].setText("⏰ Finished")
-                                ui_widgets["status_label"].setStyleSheet("color: #ef4444; font-weight: bold;")  # Red for finished
-                                
-                        # Update pause button text, state, and styling
-                        if "pause_btn" in ui_widgets and ui_widgets["pause_btn"]:
-                            if timer.get("is_ringing", False) or timer.get("has_finished", False):
-                                ui_widgets["pause_btn"].setText("Resume")
-                                ui_widgets["pause_btn"].setIcon(self.get_icon("play"))
-                                ui_widgets["pause_btn"].setEnabled(False)  # Disable for finished timers
-                                ui_widgets["pause_btn"].setStyleSheet("opacity: 0.5; background-color: #6b7280; color: #9ca3af;")  # Clear disabled style
-                            elif timer.get("is_paused", False):
-                                ui_widgets["pause_btn"].setText("Resume")
-                                ui_widgets["pause_btn"].setIcon(self.get_icon("play"))
-                                ui_widgets["pause_btn"].setEnabled(True)
-                                ui_widgets["pause_btn"].setStyleSheet("")  # Reset to default enabled style
-                            else:
-                                ui_widgets["pause_btn"].setText("Pause")
-                                ui_widgets["pause_btn"].setIcon(self.get_icon("pause"))
-                                ui_widgets["pause_btn"].setEnabled(True)
-                                ui_widgets["pause_btn"].setStyleSheet("")  # Reset to default enabled style
+                                status_label.setText("Finished")
+                                status_label.setStyleSheet("color: #ef4444; font-weight: bold;")
+                                if "status_icon_label" in ui_widgets and ui_widgets["status_icon_label"]:
+                                    ui_widgets["status_icon_label"].setPixmap(self.get_icon("alarm").pixmap(24, 24))
+                                if "icon_label" in ui_widgets and ui_widgets["icon_label"]:
+                                    ui_widgets["icon_label"].setPixmap(self.get_icon("alarm").pixmap(24, 24))
                     except RuntimeError:
-                        # Widget was deleted, remove from ui_widgets
                         timer.pop("ui_widgets", None)
 
     def get_primary_timer_index(self):
@@ -2213,79 +2383,113 @@ class TimerApp(QMainWindow):
 
     def update_large_timer_display(self):
         """Update the large timer display with the current primary timer"""
-        running_indices = self.get_running_timer_indices()
-        
-        # Update current primary timer index if needed
-        if not running_indices:
-            # No running timers
+        timer = None
+        show_active = False
+
+        # Always show the timer at self.current_primary_timer_index if it exists
+        if 0 <= self.current_primary_timer_index < len(self.timers):
+            timer = self.timers[self.current_primary_timer_index]
+            if timer and (not timer.get("has_finished", False) or timer.get("is_ringing", False) or timer.get("is_paused", False)):
+                show_active = True
+
+        # If not, try to find any running/paused/ringing timer
+        if not show_active:
+            for i, t in enumerate(self.timers):
+                if t and (not t.get("has_finished", False) or t.get("is_ringing", False) or t.get("is_paused", False)):
+                    self.current_primary_timer_index = i
+                    timer = t
+                    show_active = True
+                    break
+
+        if show_active and timer:
+            self.active_timer_frame.setVisible(True)
+            self.active_timer_placeholder.setVisible(False)
+            # Update navigation button states
+            self.large_prev_button.setEnabled(len(self.get_running_timer_indices()) > 1)
+            self.large_next_button.setEnabled(len(self.get_running_timer_indices()) > 1)
+            
+            # Update display
+            self.large_timer_name.setText(timer["name"])
+            if timer.get("description"):
+                self.large_timer_description.setText(timer["description"])
+                self.large_timer_description.setVisible(True)
+            else:
+                self.large_timer_description.setVisible(False)
+            
+            # Format time display
+            remaining = timer["remaining_seconds"]
+            hours = remaining // 3600
+            minutes = (remaining % 3600) // 60
+            seconds = remaining % 60
+            
+            if timer["is_ringing"] or timer.get("has_finished", False):
+                time_text = "Time's Up"
+            elif hours > 0:
+                time_text = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+            else:
+                time_text = f"{minutes:02d}:{seconds:02d}"
+            
+            self.large_timer_time.setText(time_text)
+            
+        # Update status icon and label
+            if timer["is_ringing"]:
+                self.large_status_icon.setPixmap(self.get_icon("bell").pixmap(28, 28))
+                self.large_timer_status.setText("Ringing!")
+                self.large_timer_status.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 18px;")
+            elif timer.get("has_finished", False):
+                self.large_status_icon.setPixmap(self.get_icon("alarm").pixmap(28, 28))
+                self.large_timer_status.setText("Time's Up!")
+                self.large_timer_status.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 18px;")
+            elif timer.get("is_paused", False):
+                self.large_status_icon.setPixmap(self.get_icon("pause").pixmap(28, 28))
+                self.large_timer_status.setText("Paused")
+                self.large_timer_status.setStyleSheet("color: #f59e0b; font-weight: 500; font-size: 18px;")
+            else:
+                self.large_status_icon.setPixmap(self.get_icon("play").pixmap(28, 28))
+                self.large_timer_status.setText("Running")
+                self.large_timer_status.setStyleSheet("color: #10b981; font-weight: 500; font-size: 18px;")
+
+            # Update status icon and label
+            if timer["is_ringing"]:
+                self.large_status_icon.setPixmap(self.get_icon("bell").pixmap(28, 28))
+                self.large_timer_status.setText("Ringing!")
+                self.large_timer_status.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 18px;")
+                self.large_pause_button.setIcon(self.get_icon("play"))
+                self.large_pause_button.setText("Resume")
+                self.large_pause_button.setEnabled(False)
+                self.large_pause_button.setStyleSheet("opacity: 0.5; background-color: #6b7280;")
+            elif timer.get("has_finished", False):
+                self.large_status_icon.setPixmap(self.get_icon("alarm").pixmap(28, 28))
+                self.large_timer_status.setText("Time's Up!")
+                self.large_timer_status.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 18px;")
+                self.large_pause_button.setIcon(self.get_icon("play"))
+                self.large_pause_button.setText("Resume")
+                self.large_pause_button.setEnabled(False)
+                self.large_pause_button.setStyleSheet("opacity: 0.5; background-color: #6b7280;")
+            elif timer.get("is_paused", False):
+                self.large_status_icon.setPixmap(self.get_icon("pause").pixmap(28, 28))
+                self.large_timer_status.setText("Paused")
+                self.large_timer_status.setStyleSheet("color: #f59e0b; font-weight: 500; font-size: 18px;")
+                self.large_pause_button.setIcon(self.get_icon("play"))
+                self.large_pause_button.setText("Resume")
+                self.large_pause_button.setEnabled(True)
+                self.large_pause_button.setStyleSheet("")
+            else:
+                self.large_status_icon.setPixmap(self.get_icon("play").pixmap(28, 28))
+                self.large_timer_status.setText("Running")
+                self.large_timer_status.setStyleSheet("color: #10b981; font-weight: 500; font-size: 18px;")
+                self.large_pause_button.setIcon(self.get_icon("pause"))
+                self.large_pause_button.setText("Pause")
+                self.large_pause_button.setEnabled(True)
+                self.large_pause_button.setStyleSheet("")
+
+        else:
             self.active_timer_frame.setVisible(False)
             self.active_timer_placeholder.setVisible(True)
-            return
-        
-        # Ensure current_primary_timer_index is valid
-        if self.current_primary_timer_index not in running_indices:
-            self.current_primary_timer_index = running_indices[0]
-        
-        timer = self.timers[self.current_primary_timer_index]
-        self.active_timer_frame.setVisible(True)
-        self.active_timer_placeholder.setVisible(False)
         
         # Update navigation button states
-        self.large_prev_button.setEnabled(len(running_indices) > 1)
-        self.large_next_button.setEnabled(len(running_indices) > 1)
-        
-        # Update display
-        self.large_timer_name.setText(timer["name"])
-        if timer.get("description"):
-            self.large_timer_description.setText(timer["description"])
-            self.large_timer_description.setVisible(True)
-        else:
-            self.large_timer_description.setVisible(False)
-        
-        # Format time display
-        remaining = timer["remaining_seconds"]
-        hours = remaining // 3600
-        minutes = (remaining % 3600) // 60
-        seconds = remaining % 60
-        
-        if timer["is_ringing"] or timer.get("has_finished", False):
-            time_text = "Time's Up"
-        elif hours > 0:
-            time_text = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-        else:
-            time_text = f"{minutes:02d}:{seconds:02d}"
-        
-        self.large_timer_time.setText(time_text)
-        
-        # Update status and controls with consistent styling
-        if timer["is_ringing"]:
-            self.large_timer_status.setText("🔔 Ringing! Stop the Alarm")
-            self.large_timer_status.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 16px;")  # Red for ringing
-            self.large_pause_button.setText("Stop")
-            self.large_pause_button.setIcon(self.get_icon('stop'))
-            self.large_pause_button.setEnabled(True)
-            self.large_pause_button.setStyleSheet("")  # Reset to default
-        elif timer.get("has_finished", False):
-            self.large_timer_status.setText("⏰ Time's Up!")
-            self.large_timer_status.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 16px;")  # Red for finished (consistent)
-            self.large_pause_button.setText("Resume")
-            self.large_pause_button.setIcon(self.get_icon('play'))
-            self.large_pause_button.setEnabled(False)  # Disable resume for finished timers
-            self.large_pause_button.setStyleSheet("opacity: 0.5; background-color: #6b7280; color: #9ca3af;")  # Clear disabled style
-        elif timer.get("is_paused", False):
-            self.large_timer_status.setText("⏸️ Paused")
-            self.large_timer_status.setStyleSheet("color: #f59e0b; font-weight: 500; font-size: 16px;")  # Orange for paused
-            self.large_pause_button.setText("Resume")
-            self.large_pause_button.setIcon(self.get_icon('play'))
-            self.large_pause_button.setEnabled(True)
-            self.large_pause_button.setStyleSheet("")  # Reset to default enabled style
-        else:
-            self.large_timer_status.setText("▶️ Running")
-            self.large_timer_status.setStyleSheet("color: #10b981; font-weight: 500; font-size: 16px;")  # Green for running
-            self.large_pause_button.setText("Pause")
-            self.large_pause_button.setIcon(self.get_icon('pause'))
-            self.large_pause_button.setEnabled(True)
-            self.large_pause_button.setStyleSheet("")  # Reset to default enabled style
+        self.large_prev_button.setEnabled(len(self.get_running_timer_indices()) > 1)
+        self.large_next_button.setEnabled(len(self.get_running_timer_indices()) > 1)
         
 
 class TimerCreationDialog(QDialog):

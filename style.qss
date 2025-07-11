@@ -759,18 +759,7 @@ QFrame#timerCard[status="ringing"] {
 
 /* === ENHANCED TIMER LABELS === */
 /* Base styling for all timer names in timer cards */
-QLabel#timerName {
-    font-size: 18px;
-    font-weight: 700;
-    color: #374151;
-    letter-spacing: 0.5px;
-    padding: 4px 0px;
-    margin: 2px 0px;
-}
 
-QWidget[darkTheme="true"] QLabel#timerName {
-    color: #E5E7EB;
-}
 
 /* Base styling for timer descriptions in timer cards */
 QLabel#timerDescription {
