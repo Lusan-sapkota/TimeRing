@@ -133,8 +133,8 @@ TimeRing transforms how you manage time on your desktop. Whether you're followin
 wget https://github.com/Lusan-sapkota/TimeRing/releases/download/v1.0.0/Application.zip
 unzip Application.zip
 
-# Inside the extracted folder, you'll find timering_1.0.0_all.deb
-sudo dpkg -i timering_1.0.0_all.deb
+# Inside the extracted folder, you'll find TimeRing_1.0.0.deb
+sudo dpkg -i TimeRing_1.0.0.deb
 
 # Launch the app
 timering
@@ -158,17 +158,17 @@ sudo dpkg -r timering
 SourceForge hosts the latest .deb package for easy installation:
 </p>
 
-[![SourceForge](https://img.shields.io/badge/SourceForge-Download-orange?style=for-the-badge&logo=sourceforge)](https://sourceforge.net/projects/timering/)
+[![SourceForge](https://img.shields.io/badge/SourceForge-Download-orange?style=for-the-badge&logo=sourceforge)](https://sourceforge.net/projects/timering/files/TimeRing_1.0.0.deb/download)
 
 <details>
 <summary><strong>Install from SourceForge (.deb)</strong></summary>
 
 ```bash
 # Download the .deb package directly
-wget https://sourceforge.net/projects/timering/files/latest/download -O timering_latest.deb
+wget https://sourceforge.net/projects/timering/files/TimeRing_1.0.0.deb/download
 
 # Install
-sudo dpkg -i timering_latest.deb
+sudo dpkg -i TimeRing_1.0.0.deb
 
 # Launch
 timering
@@ -242,18 +242,18 @@ Give your timer a meaningful name<br>
 </td>
 <td align="center" width="25%">
 <h4>2️⃣ Set Duration</h4>
-Set time in minutes<br>
-<i>(supports decimal values)</i>
+Set time in hours, minutes, seconds anything you want<br>
+<i>(or simply use the quick time)</i>
 </td>
 <td align="center" width="25%">
 <h4>3️⃣ Add Description</h4>
 Click the icon to add<br>
-detailed notes <i>(optional)</i>
+max 50 words description <i>(optional)</i>
 </td>
 <td align="center" width="25%">
 <h4>4️⃣ Choose Sound</h4>
 Click the icon to select<br>
-custom alarm sound <i>(optional)</i>
+custom sound, can be customized per timer or global deafult <i>(optional)</i>
 </td>
 </tr>
 </table>
