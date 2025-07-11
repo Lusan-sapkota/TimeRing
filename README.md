@@ -139,20 +139,21 @@ Each timer card displays:
 
   Below is a modular overview of timer states, their icons, colors, and available actions:
 
-  | **State**   | **Icon**                                   | **Color** | **Available Actions**                  |
-  |:------------|:-------------------------------------------|:----------|:---------------------------------------|
-  | **Running** | ![](./images/icons/play.svg)               | Green     | Pause, Stop, Edit, Change Sound        |
-  | **Paused**  | ![](./images/icons/pause.svg)              | Orange    | Resume, Stop, Edit, Change Sound       |
-  | **Ringing** | ![](./images/icons/bell.svg)               | Red       | Stop (to silence)                      |
-  | **Time's Up** | ![](./images/icons/alarm.svg)            | Red       | Rerun, Edit, Delete                    |
+  | **State**     | **Icon**                                      | **Color** | **Available Actions**                  |
+  |:--------------|:----------------------------------------------|:----------|:---------------------------------------|
+  | **Running**   | <img src="./images/icons/play.svg" width="20" alt="Running">   | Green     | Pause, Stop, Edit, Change Sound        |
+  | **Paused**    | <img src="./images/icons/pause.svg" width="20" alt="Paused">   | Orange    | Resume, Stop, Edit, Change Sound       |
+  | **Ringing**   | <img src="./images/icons/bell.svg" width="20" alt="Ringing">   | Red       | Stop (to silence)                      |
+  | **Time's Up** | <img src="./images/icons/alarm.svg" width="20" alt="Time's Up">| Red       | Rerun, Edit, Delete                    |
 
   > **Tip:**  
   > - **Delete:** Remove timer  
   > - Icons visually indicate each timer state:  
-  >   - ![](./images/icons/play.svg) Running  
-  >   - ![](./images/icons/pause.svg) Paused  
-  >   - ![](./images/icons/bell.svg) Ringing  
-  >   - ![](./images/icons/alarm.svg) Time's Up  
+  >   - <img src="./images/icons/play.svg" width="16" alt="Running"> Running  
+  >   - <img src="./images/icons/pause.svg" width="16" alt="Paused"> Paused  
+  >   - <img src="./images/icons/bell.svg" width="16" alt="Ringing"> Ringing  
+  >   - <img src="./images/icons/alarm.svg" width="16" alt="Time's Up"> Time's Up  
+
 
 ### Active Timer Block
 
