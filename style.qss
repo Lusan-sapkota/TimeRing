@@ -49,14 +49,7 @@ QPushButton {
     color: #FFFFFF;
 }
 
-QPushButton:hover {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                               stop:0 rgba(70, 111, 170, 0.95),
-                               stop:0.02 rgba(75, 116, 175, 0.93),
-                               stop:0.98 rgba(53, 86, 138, 0.92),
-                               stop:1 rgba(53, 86, 138, 0.9));
-    border: 1px solid rgba(255, 255, 255, 0.4);
-}
+
 
 QPushButton:pressed {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
@@ -99,6 +92,46 @@ QPushButton#dangerButton {
 QPushButton#dangerButton:hover {
     background-color: rgba(197, 48, 48, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Disabled Button Styling */
+QPushButton:disabled {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                               stop:0 rgba(107, 114, 128, 0.6),
+                               stop:1 rgba(75, 85, 99, 0.5));
+    color: rgba(156, 163, 175, 0.8);
+    border: 1px solid rgba(156, 163, 175, 0.3);
+    opacity: 0.6;
+}
+
+QPushButton:disabled[darkTheme="true"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                               stop:0 rgba(55, 65, 81, 0.6),
+                               stop:1 rgba(31, 41, 55, 0.5));
+    color: rgba(107, 114, 128, 0.8);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+    opacity: 0.6;
+}
+
+QPushButton#secondaryButton:disabled {
+    background-color: rgba(156, 163, 175, 0.4);
+    color: rgba(107, 114, 128, 0.6);
+    border: 1px solid rgba(156, 163, 175, 0.2);
+    opacity: 0.5;
+}
+
+QPushButton#dangerButton:disabled {
+    background-color: rgba(156, 163, 175, 0.4);
+    color: rgba(107, 114, 128, 0.6);
+    border: 1px solid rgba(156, 163, 175, 0.2);
+    opacity: 0.5;
+}
+
+QPushButton#warningButton:disabled {
+    background-color: rgba(156, 163, 175, 0.4);
+    color: rgba(107, 114, 128, 0.6);
+    border: 1px solid rgba(156, 163, 175, 0.2);
+    opacity: 0.5;
 }
 
 /* === INPUTS === */
