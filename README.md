@@ -141,18 +141,18 @@ Each timer card displays:
 
   | **State**   | **Icon**                                   | **Color** | **Available Actions**                  |
   |:------------|:-------------------------------------------|:----------|:---------------------------------------|
-  | **Running** | ![](./images/icons/play.png)               | Green     | Pause, Stop, Edit, Change Sound        |
-  | **Paused**  | ![](./images/icons/pause.png)              | Orange    | Resume, Stop, Edit, Change Sound       |
-  | **Ringing** | ![](./images/icons/bell.png)               | Red       | Stop (to silence)                      |
-  | **Time's Up** | ![](./images/icons/alarm.png)            | Red       | Rerun, Edit, Delete                    |
+  | **Running** | ![](./images/icons/play.svg)               | Green     | Pause, Stop, Edit, Change Sound        |
+  | **Paused**  | ![](./images/icons/pause.svg)              | Orange    | Resume, Stop, Edit, Change Sound       |
+  | **Ringing** | ![](./images/icons/bell.svg)               | Red       | Stop (to silence)                      |
+  | **Time's Up** | ![](./images/icons/alarm.svg)            | Red       | Rerun, Edit, Delete                    |
 
   > **Tip:**  
   > - **Delete:** Remove timer  
   > - Icons visually indicate each timer state:  
-  >   - ![](./images/icons/play.png) Running  
-  >   - ![](./images/icons/pause.png) Paused  
-  >   - ![](./images/icons/bell.png) Ringing  
-  >   - ![](./images/icons/alarm.png) Time's Up  
+  >   - ![](./images/icons/play.svg) Running  
+  >   - ![](./images/icons/pause.svg) Paused  
+  >   - ![](./images/icons/bell.svg) Ringing  
+  >   - ![](./images/icons/alarm.svg) Time's Up  
 
 ### Active Timer Block
 
