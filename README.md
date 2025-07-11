@@ -3,14 +3,25 @@
 <div align="center">
   <img src="images/logo.png" alt="TimeRing Logo" width="128" height="128">
   
-  **A lightweight, modern, and beautiful timer application for your desktop.**
+  <strong>A lightweight, modern, and beautiful timer application for your desktop.</strong>
   
-  [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Lusan-sapkota/TimeRing)
-  [![Python](https://img.shields.io/badge/python-3.11+-green.svg)](https://www.python.org/)
-  [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-  [![Platform](https://img.shields.io/badge/platform-Linux-orange.svg)](#platform-compatibility)
-  
-  [**View on GitHub**](https://github.com/Lusan-sapkota/TimeRing)
+  <br><br>
+  <a href="https://github.com/Lusan-sapkota/TimeRing">
+    <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version">
+  </a>
+  <a href="https://www.python.org/">
+    <img src="https://img.shields.io/badge/python-3.11+-green.svg" alt="Python">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
+  </a>
+  <a href="#platform-compatibility">
+    <img src="https://img.shields.io/badge/platform-Linux-orange.svg" alt="Platform">
+  </a>
+
+  <br><br>
+  <a href="https://github.com/Lusan-sapkota/TimeRing"><strong>View on GitHub</strong></a> | 
+  <a href="https://sourceforge.net/projects/timering/"><strong>Download from SourceForge</strong></a>
 </div>
 
 <div align="center">
@@ -57,7 +68,7 @@ TimeRing is a versatile and user-friendly timer application designed to help you
 
 ## 📦 Installation
 
-For an easy installation on Debian-based systems (like Ubuntu), a `.deb` package will be available in the [GitHub Releases](https://github.com/Lusan-sapkota/TimeRing/releases) section and on SourceForge. This is the recommended method for most users.
+For an easy installation on Debian-based systems (like Ubuntu), a .deb package is available in the GitHub Releases section and on SourceForge. This is the recommended method for most users.
 
 For other systems or for development, you can install from source.
 
