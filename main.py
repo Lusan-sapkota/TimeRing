@@ -21,7 +21,6 @@ import vlc
 import requests
 from version import get_version
 
-# Application metadata
 APP_NAME = "TimeRing"
 APP_VERSION = get_version()
 APP_DEVELOPER = "Lusan Sapkota"
@@ -56,7 +55,6 @@ class TimerEditDialog(QDialog):
 def detect_system_theme():
     """Detect if the system is using dark theme"""
     try:
-        # Try to detect theme using Qt's palette
         app = QApplication.instance()
         if app:
             palette = app.palette()
@@ -70,7 +68,6 @@ def detect_system_theme():
             if bg_lightness < text_lightness:
                 return True
         
-        # Fallback: check environment variables
         desktop = os.environ.get('XDG_CURRENT_DESKTOP', '').lower()
         if 'gnome' in desktop:
             try:
@@ -81,7 +78,6 @@ def detect_system_theme():
                 pass
         elif 'kde' in desktop:
             try:
-                # Check KDE theme
                 result = subprocess.run(['kreadconfig5', '--group', 'General', '--key', 'ColorScheme'], 
                                       capture_output=True, text=True, timeout=2)
                 return 'dark' in result.stdout.lower()
@@ -90,7 +86,7 @@ def detect_system_theme():
     except:
         pass
     
-    return False  # Default to light theme
+    return False
 
 def get_status_icon(self, status):
     if status == "running":
@@ -100,7 +96,7 @@ def get_status_icon(self, status):
     elif status == "timesup":
         return self.get_icon("status_timesup")
     else:
-        return QIcon()  # fallback
+        return QIcon()
 
 def apply_theme_to_widget(widget, is_dark=None):
     """Apply theme property to widget and its children"""
@@ -109,20 +105,16 @@ def apply_theme_to_widget(widget, is_dark=None):
     
     widget.setProperty("darkTheme", is_dark)
     
-    # Apply to all child widgets recursively
     for child in widget.findChildren(QWidget):
         child.setProperty("darkTheme", is_dark)
     
-    # Refresh styles
     widget.style().unpolish(widget)
     widget.style().polish(widget)
     
-    # Force refresh for all children
     for child in widget.findChildren(QWidget):
         child.style().unpolish(child)
         child.style().polish(child)
     
-    # Force repaint
     widget.update()
 
 
@@ -167,7 +159,6 @@ class SettingsModalDialog(QDialog):
         self.setModal(True)
         self.resize(500, 400)
         
-        # Apply theme before setting up UI
         is_dark = detect_system_theme()
         apply_theme_to_widget(self, is_dark)
         
@@ -178,12 +169,10 @@ class SettingsModalDialog(QDialog):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(20)
         
-        # Header
         header = QLabel("Settings")
         header.setObjectName("titleLabel")
         layout.addWidget(header)
         
-        # Sound settings section
         sound_frame = QFrame()
         sound_frame.setObjectName("settingsFrame")
         sound_layout = QVBoxLayout(sound_frame)
@@ -192,7 +181,6 @@ class SettingsModalDialog(QDialog):
         sound_label.setObjectName("subtitleLabel")
         sound_layout.addWidget(sound_label)
         
-        # Current sound display
         current_sound = ""
         if self.parent_window:
             current_sound = self.parent_window.settings.get("default_sound", "")
@@ -202,7 +190,6 @@ class SettingsModalDialog(QDialog):
         self.sound_path_label.setObjectName("statusLabel")
         sound_layout.addWidget(self.sound_path_label)
         
-        # Sound buttons
         sound_buttons = QHBoxLayout()
         
         browse_btn = QPushButton("Browse Files")
@@ -223,7 +210,6 @@ class SettingsModalDialog(QDialog):
         sound_layout.addLayout(sound_buttons)
         layout.addWidget(sound_frame)
         
-        # Quick settings
         quick_frame = QFrame()
         quick_layout = QVBoxLayout(quick_frame)
         
@@ -243,7 +229,6 @@ class SettingsModalDialog(QDialog):
         
         layout.addWidget(quick_frame)
         
-        # Advanced settings button
         advanced_btn = QPushButton("Advanced Settings")
         advanced_btn.setIcon(self.parent_window.get_icon("settings"))
         advanced_btn.setObjectName("secondaryButton")
@@ -252,13 +237,11 @@ class SettingsModalDialog(QDialog):
         
         layout.addStretch()
         
-        # Dialog buttons
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         button_box.accepted.connect(self.save_and_close)
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
         
-        # Media player for preview
         self.preview_player = vlc.MediaPlayer()
 
     def browse_sound(self):
@@ -267,18 +250,14 @@ class SettingsModalDialog(QDialog):
         file_dialog.setNameFilter("Audio Files (*.mp3 *.wav *.ogg *.m4a)")
         file_dialog.setWindowTitle("Select Default Sound")
         
-        # Apply theme to file dialog
         is_dark = detect_system_theme()
         apply_theme_to_widget(file_dialog, is_dark)
         
-        # Force theme application to all child widgets after showing
         file_dialog.show()
         
-        # Apply theme recursively to all child widgets
         for child in file_dialog.findChildren(QWidget):
             apply_theme_to_widget(child, is_dark)
         
-        # Force style refresh
         file_dialog.style().unpolish(file_dialog)
         file_dialog.style().polish(file_dialog)
         
@@ -313,7 +292,6 @@ class SettingsModalDialog(QDialog):
     def save_and_close(self):
         """Save settings and close"""
         if self.parent_window:
-            # Update sound setting
             sound_text = self.sound_path_label.text()
             if sound_text == "Built-in default sound":
                 self.parent_window.settings["default_sound"] = ""
@@ -321,7 +299,6 @@ class SettingsModalDialog(QDialog):
                 self.parent_window.settings["default_sound"] = sound_text
                 self.parent_window.alarm_sound = sound_text
             
-            # Update other settings
             self.parent_window.settings["show_notifications"] = self.notifications_check.isChecked()
             self.parent_window.settings["auto_start_timers"] = self.auto_start_check.isChecked()
             
@@ -344,7 +321,6 @@ class HelpModalDialog(QDialog):
         self.setModal(True)
         self.resize(600, 500)
         
-        # Apply theme before setting up UI
         is_dark = detect_system_theme()
         apply_theme_to_widget(self, is_dark)
         
@@ -354,12 +330,10 @@ class HelpModalDialog(QDialog):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(24, 24, 24, 24)
         
-        # Header
         header = QLabel("Help & User Guide")
         header.setObjectName("titleLabel")
         layout.addWidget(header)
         
-        # Scrollable help content
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         
@@ -479,7 +453,6 @@ class HelpModalDialog(QDialog):
         help_content.setTextFormat(Qt.RichText)
         help_content.setObjectName("helpContent")
         
-        # Apply proper theme styling to help content
         is_dark = detect_system_theme()
         apply_theme_to_widget(help_content, is_dark)
         
@@ -487,7 +460,6 @@ class HelpModalDialog(QDialog):
         
         layout.addWidget(scroll_area)
         
-        # Close button
         close_btn = QPushButton("Close")
         close_btn.clicked.connect(self.accept)
         layout.addWidget(close_btn)
@@ -503,7 +475,6 @@ class InfoModalDialog(QDialog):
         self.setModal(True)
         self.resize(400, 350)
         
-        # Apply theme before setting up UI
         is_dark = detect_system_theme()
         apply_theme_to_widget(self, is_dark)
         
@@ -514,7 +485,6 @@ class InfoModalDialog(QDialog):
         layout.setContentsMargins(32, 32, 32, 32)
         layout.setSpacing(20)
         
-        # App logo
         logo_label = QLabel()
         if self.parent_window:
             logo_path = os.path.join(self.parent_window.app_dir, "images", "logo.png")
@@ -525,7 +495,6 @@ class InfoModalDialog(QDialog):
         logo_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(logo_label)
         
-        # App info
         app_info = QLabel(f"""
 <div style="text-align: center;">
 <h1>{APP_NAME}</h1>
@@ -544,7 +513,6 @@ integration with KDE and GNOME.
         app_info.setObjectName("appInfo")
         layout.addWidget(app_info)
         
-        # System info
         system_info = QLabel(f"""
 <div style="text-align: center;">
 <p>
@@ -561,7 +529,6 @@ integration with KDE and GNOME.
         
         layout.addStretch()
         
-        # Close button
         close_btn = QPushButton("Close")
         close_btn.clicked.connect(self.accept)
         layout.addWidget(close_btn)
@@ -573,28 +540,23 @@ class TimerDescriptionDialog(QDialog):
         self.setWindowTitle("Timer Description")
         self.setMinimumWidth(400)
         
-        # Apply theme before setting up UI
         is_dark = detect_system_theme()
         apply_theme_to_widget(self, is_dark)
         
         layout = QVBoxLayout(self)
         
-        # Description text edit
         self.description_edit = QTextEdit()
         self.description_edit.setPlaceholderText("Enter timer description (max 50 words)")
         self.description_edit.setText(description)
         layout.addWidget(self.description_edit)
         
-        # Word count label
         self.word_count_label = QLabel("0/50 words")
         apply_theme_to_widget(self.word_count_label, is_dark)
         layout.addWidget(self.word_count_label)
         
-        # Update word count when text changes
         self.description_edit.textChanged.connect(self.update_word_count)
         self.update_word_count()
         
-        # Dialog buttons
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
@@ -606,7 +568,6 @@ class TimerDescriptionDialog(QDialog):
         word_count = len(text.split()) if text else 0
         self.word_count_label.setText(f"{word_count}/50 words")
         
-        # Disable OK button if over word limit
         button_box = self.findChild(QDialogButtonBox)
         if button_box:
             ok_button = button_box.button(QDialogButtonBox.Ok)
@@ -625,43 +586,36 @@ class SoundSelectionDialog(QDialog):
         
         self.current_sound = current_sound
         
-        # Apply theme before setting up UI
         is_dark = detect_system_theme()
         apply_theme_to_widget(self, is_dark)
         
         layout = QVBoxLayout(self)
         
-        # Sound path display
         self.sound_path_label = QLabel(current_sound or "Default sound")
         self.sound_path_label.setWordWrap(True)
         layout.addWidget(self.sound_path_label)
         
-        # Browse button
         self.browse_button = QPushButton("Browse...")
         self.browse_button.clicked.connect(self.browse_sound)
         apply_theme_to_widget(self.browse_button, is_dark)
         layout.addWidget(self.browse_button)
         
-        # Preview button
         self.preview_button = QPushButton("Preview Sound")
         self.preview_button.clicked.connect(self.preview_sound)
         apply_theme_to_widget(self.preview_button, is_dark)
         layout.addWidget(self.preview_button)
         
-        # Use default button
         self.default_button = QPushButton("Use Default Sound")
         self.default_button.clicked.connect(self.use_default_sound)
         apply_theme_to_widget(self.default_button, is_dark)
         layout.addWidget(self.default_button)
         
-        # Dialog buttons
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         apply_theme_to_widget(button_box, is_dark)
         layout.addWidget(button_box)
         
-        # Media player for preview
         self.preview_player = vlc.MediaPlayer()
     
     def browse_sound(self):
@@ -669,18 +623,14 @@ class SoundSelectionDialog(QDialog):
         file_dialog.setNameFilter("Audio Files (*.mp3 *.wav *.ogg)")
         file_dialog.setWindowTitle("Select Notification Sound")
         
-        # Apply theme to file dialog
         is_dark = detect_system_theme()
         apply_theme_to_widget(file_dialog, is_dark)
         
-        # Force theme application to all child widgets after showing
         file_dialog.show()
         
-        # Apply theme recursively to all child widgets
         for child in file_dialog.findChildren(QWidget):
             apply_theme_to_widget(child, is_dark)
         
-        # Force style refresh
         file_dialog.style().unpolish(file_dialog)
         file_dialog.style().polish(file_dialog)
         
@@ -691,7 +641,6 @@ class SoundSelectionDialog(QDialog):
     def preview_sound(self):
         sound_to_play = self.current_sound
         if not sound_to_play or not os.path.exists(sound_to_play):
-            # Use default sound from parent window
             parent_app = self.parent()
             if parent_app and isinstance(parent_app, TimerApp) and hasattr(parent_app, "alarm_sound"):
                 sound_to_play = parent_app.alarm_sound
@@ -722,15 +671,13 @@ class SettingsDialog(QDialog):
         self.setMinimumWidth(500)
         self.setMinimumHeight(400)
         
-        self.settings = settings.copy()  # Make a copy to work with
+        self.settings = settings.copy()
         
-        # Apply theme before setting up UI
         is_dark = detect_system_theme()
         apply_theme_to_widget(self, is_dark)
         
         layout = QVBoxLayout(self)
         
-        # Create tabs
         self.tabs = QTabWidget()
         self.general_tab = QWidget()
         self.notifications_tab = QWidget()
@@ -740,7 +687,6 @@ class SettingsDialog(QDialog):
         self.tabs.addTab(self.notifications_tab, "Notifications")
         self.tabs.addTab(self.sounds_tab, "Sounds")
         
-        # Apply theme to tabs and tab widgets
         apply_theme_to_widget(self.tabs, is_dark)
         apply_theme_to_widget(self.general_tab, is_dark)
         apply_theme_to_widget(self.notifications_tab, is_dark)
@@ -748,55 +694,45 @@ class SettingsDialog(QDialog):
         
         layout.addWidget(self.tabs)
         
-        # Set up each tab
         self.setup_general_tab()
         self.setup_notifications_tab()
         self.setup_sounds_tab()
         
-        # Dialog buttons
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         apply_theme_to_widget(button_box, is_dark)
         layout.addWidget(button_box)
         
-        # Media player for sound preview
         self.preview_player = vlc.MediaPlayer()
     
     def setup_general_tab(self):
         layout = QVBoxLayout(self.general_tab)
         
-        # Get theme info
         is_dark = detect_system_theme()
         
-        # General settings group
         general_group = QGroupBox("General Settings")
         apply_theme_to_widget(general_group, is_dark)
         general_layout = QVBoxLayout(general_group)
         
-        # Auto-start timers on app launch
         self.auto_start_check = create_glass_checkbox("Auto-start timers on application launch")
         self.auto_start_check.setChecked(self.settings.get("auto_start_timers", True))
         general_layout.addWidget(self.auto_start_check)
         
-        # Save timer state on exit
         self.save_state_check = create_glass_checkbox("Save timer state on exit")
         self.save_state_check.setChecked(self.settings.get("save_state", True))
         general_layout.addWidget(self.save_state_check)
         
         layout.addWidget(general_group)
         
-        # Update settings group
         update_group = QGroupBox("Update Settings")
         apply_theme_to_widget(update_group, is_dark)
         update_layout = QVBoxLayout(update_group)
         
-        # Auto-check for updates
         self.auto_update_check = create_glass_checkbox("Check for updates automatically")
         self.auto_update_check.setChecked(self.settings.get("auto_check_updates", True))
         update_layout.addWidget(self.auto_update_check)
         
-        # Manual update check button
         update_button_layout = QHBoxLayout()
         self.check_updates_btn = QPushButton("Check for Updates Now")
         self.check_updates_btn.clicked.connect(self.check_for_updates)
@@ -807,31 +743,25 @@ class SettingsDialog(QDialog):
         
         layout.addWidget(update_group)
         
-        # Add spacer
         layout.addStretch()
     
     def setup_notifications_tab(self):
         layout = QVBoxLayout(self.notifications_tab)
         
-        # Get theme info
         is_dark = detect_system_theme()
         
-        # Notification settings group
         notifications_group = QGroupBox("Notification Settings")
         apply_theme_to_widget(notifications_group, is_dark)
         notifications_layout = QVBoxLayout(notifications_group)
         
-        # Show desktop notifications
         self.show_notifications_check = create_glass_checkbox("Show desktop notifications")
         self.show_notifications_check.setChecked(self.settings.get("show_notifications", True))
         notifications_layout.addWidget(self.show_notifications_check)
         
-        # Include description in notifications
         self.include_desc_check = create_glass_checkbox("Include timer description in notifications")
         self.include_desc_check.setChecked(self.settings.get("include_description", True))
         notifications_layout.addWidget(self.include_desc_check)
         
-        # Notification urgency - inline with proper spacing
         urgency_layout = QHBoxLayout()
         urgency_layout.setContentsMargins(0, 16, 0, 8)
         urgency_layout.setSpacing(12)
@@ -855,21 +785,17 @@ class SettingsDialog(QDialog):
         
         layout.addWidget(notifications_group)
         
-        # Add spacer
         layout.addStretch()
     
     def setup_sounds_tab(self):
         layout = QVBoxLayout(self.sounds_tab)
         
-        # Get theme info
         is_dark = detect_system_theme()
         
-        # Default sound selection
         sound_group = QGroupBox("Default Sound")
         apply_theme_to_widget(sound_group, is_dark)
         sound_layout = QVBoxLayout(sound_group)
         
-        # Current default sound
         self.default_sound_path = self.settings.get("default_sound", "")
         display_path = self.default_sound_path or "Built-in default sound"
         self.sound_path_label = QLabel(display_path)
@@ -877,22 +803,18 @@ class SettingsDialog(QDialog):
         apply_theme_to_widget(self.sound_path_label, is_dark)
         sound_layout.addWidget(self.sound_path_label)
         
-        # Sound selection buttons
         buttons_layout = QHBoxLayout()
         
-        # Browse button
         self.browse_button = QPushButton("Browse...")
         self.browse_button.clicked.connect(self.browse_sound)
         apply_theme_to_widget(self.browse_button, is_dark)
         buttons_layout.addWidget(self.browse_button)
         
-        # Preview button
         self.preview_button = QPushButton("Preview")
         self.preview_button.clicked.connect(self.preview_sound)
         apply_theme_to_widget(self.preview_button, is_dark)
         buttons_layout.addWidget(self.preview_button)
         
-        # Reset to default button
         self.reset_button = QPushButton("Use Built-in")
         self.reset_button.clicked.connect(self.use_default_sound)
         apply_theme_to_widget(self.reset_button, is_dark)
@@ -901,19 +823,16 @@ class SettingsDialog(QDialog):
         sound_layout.addLayout(buttons_layout)
         layout.addWidget(sound_group)
         
-        # Sound options
         options_group = QGroupBox("Sound Options")
         apply_theme_to_widget(options_group, is_dark)
         options_layout = QVBoxLayout(options_group)
         
-        # Loop sound
         self.loop_sound_check = create_glass_checkbox("Loop sound until stopped")
         self.loop_sound_check.setChecked(self.settings.get("loop_sound", True))
         options_layout.addWidget(self.loop_sound_check)
         
         layout.addWidget(options_group)
         
-        # Add spacer
         layout.addStretch()
     
     def browse_sound(self):
@@ -921,18 +840,14 @@ class SettingsDialog(QDialog):
         file_dialog.setNameFilter("Audio Files (*.mp3 *.wav *.ogg)")
         file_dialog.setWindowTitle("Select Default Sound")
         
-        # Apply theme to file dialog
         is_dark = detect_system_theme()
         apply_theme_to_widget(file_dialog, is_dark)
         
-        # Force theme application to all child widgets after showing
         file_dialog.show()
         
-        # Apply theme recursively to all child widgets
         for child in file_dialog.findChildren(QWidget):
             apply_theme_to_widget(child, is_dark)
         
-        # Force style refresh
         file_dialog.style().unpolish(file_dialog)
         file_dialog.style().polish(file_dialog)
         
@@ -943,7 +858,6 @@ class SettingsDialog(QDialog):
     def preview_sound(self):
         sound_to_play = self.default_sound_path
         if not sound_to_play or not os.path.exists(sound_to_play):
-            # Use built-in sound
             parent_app = self.parent()
             if parent_app and isinstance(parent_app, TimerApp) and hasattr(parent_app, "alarm_sound"):
                 sound_to_play = parent_app.alarm_sound
@@ -959,7 +873,6 @@ class SettingsDialog(QDialog):
         self.sound_path_label.setText("Built-in default sound")
     
     def get_settings(self):
-        # Update settings from UI
         self.settings["auto_start_timers"] = self.auto_start_check.isChecked()
         self.settings["save_state"] = self.save_state_check.isChecked()
         self.settings["show_notifications"] = self.show_notifications_check.isChecked()
@@ -975,7 +888,6 @@ class SettingsDialog(QDialog):
         """Check for updates from GitHub repository"""
 
         try:
-            # Check GitHub releases API for latest version
             response = requests.get("https://api.github.com/repos/Lusan-sapkota/TimeRing/releases/latest", timeout=10)
             if response.status_code == 200:
                 release_data = response.json()
@@ -983,7 +895,6 @@ class SettingsDialog(QDialog):
                 current_version = get_version()
                 
                 if latest_version != current_version:
-                    # Show update dialog
                     msg_box = QMessageBox(self)
                     msg_box.setWindowTitle("Update Available")
                     msg_box.setText(f"A new version ({latest_version}) is available!\n\nCurrent version: {current_version}")
@@ -993,7 +904,6 @@ class SettingsDialog(QDialog):
                     download_btn = QPushButton("Download Update")
                     msg_box.addButton(download_btn, QMessageBox.AcceptRole)
                     
-                    # Apply theme
                     is_dark = detect_system_theme()
                     apply_theme_to_widget(msg_box, is_dark)
                     
@@ -1002,7 +912,6 @@ class SettingsDialog(QDialog):
                         import webbrowser
                         webbrowser.open(release_data["html_url"])
                 else:
-                    # No update available
                     msg_box = QMessageBox(self)
                     msg_box.setWindowTitle("No Updates")
                     msg_box.setText("You are running the latest version of TimeRing!")
@@ -1015,7 +924,6 @@ class SettingsDialog(QDialog):
                 raise Exception(f"HTTP {response.status_code}")
                 
         except Exception as e:
-            # Error checking for updates
             msg_box = QMessageBox(self)
             msg_box.setWindowTitle("Update Check Failed")
             msg_box.setText("Failed to check for updates.")
@@ -1038,64 +946,52 @@ class TimerApp(QMainWindow):
         self.cli_args = cli_args
         self.setWindowTitle(APP_NAME)
         self.setGeometry(100, 100, 600, 700)
-        self.setMinimumSize(500, 600)  # Set minimum size for scalability
+        self.setMinimumSize(500, 600)
         
-        # Configuration
         self.config_dir = os.path.expanduser(f"~/.config/{APP_NAME}")
         self.state_file = os.path.join(self.config_dir, "timers.json")
         self.settings_file = os.path.join(self.config_dir, "settings.json")
         
-        # Get the application directory
         self.app_dir = os.path.dirname(os.path.abspath(__file__))
         self.alarm_sound = os.path.join(self.app_dir, "sounds", "timesup.mp3")
         
-        # Set application icon
         icon_path = os.path.join(self.app_dir, "images", "logo.png")
         self.setWindowIcon(QIcon(icon_path))
         
-        # Create config directory if it doesn't exist
         os.makedirs(self.config_dir, exist_ok=True)
         
-        # Load settings
         self.settings = self.load_settings()
         
-        # Handle CLI arguments
         self.handle_cli_args()
         
-        # Active timers and media players
         self.timers = []
         self.last_timer_count = 0  # Track timer count to prevent unnecessary rebuilds
-        self.current_primary_timer_index = 0  # Track which timer is currently displayed
+        self.current_primary_timer_index = 0
         self.media_players = {}
         self.timer_threads = {}
         self.timer_events = {}
         
-        # Initialize UI
         self.init_ui()
         
-        # Load saved timers
         self.load_timers()
         
-        # Track last save time to avoid excessive I/O
         self.last_save_time = 0
         self.save_threshold = 1.0  # Save at most once per second
         
-        # Update timer display more frequently for smoother updates
         self.update_timer_labels_timer = QTimer(self)
         self.update_timer_labels_timer.timeout.connect(self.update_timer_labels)
-        self.update_timer_labels_timer.start(100)  # Update only labels every 100ms
+        self.update_timer_labels_timer.start(100)
 
         self.update_timer = QTimer(self)
         self.update_timer.timeout.connect(self.update_timers_display)
-        self.update_timer.start(500)  # Rebuild UI every 500ms (or you can trigger manually)
+        self.update_timer.start(500)
 
     def get_icon(self, name):
         """Get icon by name from bundled icons with theme support"""
         icon_path = os.path.join(self.app_dir, "images", "icons", f"{name}.svg")
         
-        # Determine icon color based on theme
         is_dark = detect_system_theme()
-        icon_color = "#ffffff" if is_dark else "#374151"  # White for dark theme, dark gray for light
+        icon_color = "#ffffff" if is_dark else "#374151"
         
         return load_svg_icon(icon_path, icon_color, 24)
     
@@ -1124,7 +1020,6 @@ class TimerApp(QMainWindow):
                 sys.exit(1)
     
     def init_ui(self):
-        # Main widget container with scroll area for compact displays
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -1134,20 +1029,17 @@ class TimerApp(QMainWindow):
         main_widget = QWidget()
         scroll_area.setWidget(main_widget)
         main_layout = QVBoxLayout(main_widget)
-        main_layout.setContentsMargins(12, 12, 12, 12)  # Reduced margins for compact mode
-        main_layout.setSpacing(12)  # Reduced spacing for compact mode
+        main_layout.setContentsMargins(12, 12, 12, 12)
+        main_layout.setSpacing(12)
         
-        # Apply theme
         is_dark = detect_system_theme()
         apply_theme_to_widget(main_widget, is_dark)
         
-        # Header with menu buttons and title
         header_widget = QWidget()
         header_layout = QHBoxLayout(header_widget)
         header_layout.setContentsMargins(0, 0, 0, 0)
         header_layout.setSpacing(12)
 
-        # App Logo
         logo_label = QLabel()
         logo_path = os.path.join(self.app_dir, "images", "logo.png")
         if os.path.exists(logo_path):
@@ -1156,14 +1048,12 @@ class TimerApp(QMainWindow):
             logo_label.setPixmap(scaled_pixmap)
         header_layout.addWidget(logo_label)
         
-        # App Title
         title_label = QLabel(APP_NAME)
         title_label.setObjectName("headerTitleLabel")
         header_layout.addWidget(title_label)
         
         header_layout.addStretch()
         
-        # Menu buttons
         menu_layout = QHBoxLayout()
         menu_layout.setSpacing(8)
         
@@ -1175,17 +1065,14 @@ class TimerApp(QMainWindow):
             btn.setFixedSize(40, 40)
             return btn
 
-        # Settings button
         settings_btn = create_header_button("settings", "Settings")
         settings_btn.clicked.connect(self.open_settings_modal)
         menu_layout.addWidget(settings_btn)
         
-        # Help button
         help_btn = create_header_button("help", "Help & Guide")
         help_btn.clicked.connect(self.open_help_modal)
         menu_layout.addWidget(help_btn)
         
-        # Info button
         info_btn = create_header_button("info", "About TimeRing")
         info_btn.clicked.connect(self.open_info_modal)
         menu_layout.addWidget(info_btn)
@@ -1193,7 +1080,6 @@ class TimerApp(QMainWindow):
         header_layout.addLayout(menu_layout)
         main_layout.addWidget(header_widget)
         
-        # Prominent Add Timer button - full width
         self.add_timer_button = QPushButton("Add Timer")
         self.add_timer_button.setStyleSheet("""
             QPushButton {
@@ -1213,18 +1099,15 @@ class TimerApp(QMainWindow):
         self.add_timer_button.clicked.connect(self.open_timer_creation_dialog)
         main_layout.addWidget(self.add_timer_button)
 
-        # Large active timer display
         self.active_timer_frame = QFrame()
-        self.active_timer_frame.setVisible(False)  # Hidden initially
+        self.active_timer_frame.setVisible(False)
         self.active_timer_frame.setObjectName("activeTimerFrame")
         active_timer_layout = QVBoxLayout(self.active_timer_frame)
         
-        # Active timer title
         active_timer_title = QLabel("Active Timer")
         active_timer_title.setObjectName("subtitleLabel")
         active_timer_layout.addWidget(active_timer_title)
         
-        # Large timer display
         self.large_timer_name = QLabel("Timer Name")
         self.large_timer_name.setObjectName("timerNameLabel")
         self.large_timer_name.setAlignment(Qt.AlignCenter)
@@ -1246,17 +1129,15 @@ class TimerApp(QMainWindow):
         self.large_timer_status.setAlignment(Qt.AlignCenter)
         self.large_timer_status.setAlignment(Qt.AlignCenter)
         
-        # Large timer controls
         large_timer_controls = QHBoxLayout()
         
-        # Previous timer button
         prev_icon = self.get_icon("play")
         pixmap = prev_icon.pixmap(24, 24)
         transform = QTransform().rotate(180)
         rotated_pixmap = pixmap.transformed(transform, Qt.SmoothTransformation)
         rotated_icon = QIcon(rotated_pixmap)
         self.large_prev_button = QPushButton("Previous")
-        self.large_prev_button.setIcon(rotated_icon)  # Set rotated icon
+        self.large_prev_button.setIcon(rotated_icon)
         self.large_prev_button.setObjectName("secondaryButton")
         self.large_prev_button.setToolTip("Switch to Previous Timer")
         self.large_prev_button.clicked.connect(self.switch_to_previous_timer)
@@ -1274,7 +1155,6 @@ class TimerApp(QMainWindow):
         self.large_stop_button.clicked.connect(lambda: self.stop_timer(self.current_primary_timer_index))
         large_timer_controls.addWidget(self.large_stop_button)
         
-        # Next timer button
         self.large_next_button = QPushButton("Next")
         self.large_next_button.setIcon(self.get_icon("play"))
         self.large_next_button.setObjectName("secondaryButton")
@@ -1286,30 +1166,27 @@ class TimerApp(QMainWindow):
         
         main_layout.addWidget(self.active_timer_frame)
 
-        # Placeholder for empty active timer area (separate from the frame)
         self.active_timer_placeholder = QLabel("No Active Timer\n\nCreate a new timer to see it here\nYour timer will appear with a large, easy-to-read display")
         self.active_timer_placeholder.setObjectName("activeTimerPlaceholder")
         self.active_timer_placeholder.setAlignment(Qt.AlignCenter)
-        self.active_timer_placeholder.setVisible(True)  # Initially visible when no timers
+        self.active_timer_placeholder.setVisible(True)
         main_layout.addWidget(self.active_timer_placeholder)
         
-        # Active timers section
         active_timers_label = QLabel("All Timers")
         active_timers_label.setObjectName("subtitleLabel")
         main_layout.addWidget(active_timers_label)
 
-        # All timers list
         self.timers_list = QListWidget()
         self.timers_list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.timers_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.timers_list.setResizeMode(QListWidget.Adjust)
-        self.timers_list.setVerticalScrollMode(QListWidget.ScrollPerPixel)  # <--- Ensure per-pixel scroll
+        self.timers_list.setVerticalScrollMode(QListWidget.ScrollPerPixel)
         self.timers_list.setMovement(QListWidget.Static)
         self.timers_list.setFlow(QListWidget.TopToBottom)
         self.timers_list.setWrapping(False)
         self.timers_list.setSelectionMode(QListWidget.NoSelection)
         self.timers_list.setFocusPolicy(Qt.NoFocus)
-        self.timers_list.setUniformItemSizes(False)  # <--- Important for smooth pixel scroll
+        self.timers_list.setUniformItemSizes(False)
 
         # Fix mouse wheel scroll jumps by subclassing and overriding wheelEvent
         class SmoothScrollList(QListWidget):
@@ -1322,9 +1199,7 @@ class TimerApp(QMainWindow):
                 else:
                     super().wheelEvent(event)
 
-        # Replace timers_list with smooth scroll subclass
         self.timers_list = SmoothScrollList()
-        # Reapply all settings to new instance
         self.timers_list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.timers_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.timers_list.setResizeMode(QListWidget.Adjust)
@@ -1347,10 +1222,8 @@ class TimerApp(QMainWindow):
         self.large_timer_status_row.addStretch()
         active_timer_layout.addLayout(self.large_timer_status_row)
         
-        # Apply initial screen size
-        self.setProperty("screenSize", "medium")  # Default
+        self.setProperty("screenSize", "medium")
         
-        # Store the current description and sound
         self.current_description = ""
         self.current_sound = ""
 
@@ -1364,17 +1237,14 @@ class TimerApp(QMainWindow):
         card_layout = QGridLayout(card_widget)
         card_widget.setObjectName("timerCard")
 
-        # Set proper size policy for consistent sizing
         card_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-        # Adjust minimum height based on compact mode
         is_compact = self.property("compactMode")
         if is_compact:
             card_widget.setMinimumHeight(100)
         else:
             card_widget.setMinimumHeight(120)
 
-        # --- Always show timer name and icon ---
         name_layout = QHBoxLayout()
         name_layout.setSpacing(8)
 
@@ -1400,22 +1270,19 @@ class TimerApp(QMainWindow):
 
         card_layout.addLayout(name_layout, 0, 0, 1, 4)
 
-        # Timer description
         if timer.get("description"):
             description_label = QLabel(timer["description"])
             description_label.setObjectName("timerDescription")
             description_label.setWordWrap(True)
             card_layout.addWidget(description_label, 1, 0, 1, 4)
 
-        # Time display
         elapsed_formatted = self.format_time(timer["total_seconds"])
         time_label = QLabel(f"{self.format_time(timer['remaining_seconds'])} | {elapsed_formatted}")
         time_label.setObjectName("timerTime")
-        time_label.setMaximumWidth(400)  # Limit width to keep it compact
+        time_label.setMaximumWidth(400)
         time_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         card_layout.addWidget(time_label, 2, 0, 1, 2)
 
-        # Status icon + label
         status_row = QHBoxLayout()
         status_icon_label = QLabel()
         status_icon_label.setFixedSize(24, 24)
@@ -1447,7 +1314,6 @@ class TimerApp(QMainWindow):
         status_row.addStretch()
         card_layout.addLayout(status_row, 2, 2, 1, 2)
 
-        # Buttons
         buttons_layout = QHBoxLayout()
         buttons_layout.setSpacing(8)
         buttons_layout.setContentsMargins(0, 12, 0, 0)
@@ -1477,7 +1343,7 @@ class TimerApp(QMainWindow):
         buttons_layout.addWidget(rerun_btn)
 
         pause_btn = QPushButton()
-        pause_btn.setIcon(self.get_icon("play")) # Icon changes based on state
+        pause_btn.setIcon(self.get_icon("play"))
         pause_btn.setToolTip("Pause/Resume")
         pause_btn.style().unpolish(pause_btn)
         pause_btn.style().polish(pause_btn)
@@ -1502,7 +1368,6 @@ class TimerApp(QMainWindow):
 
         card_layout.addLayout(buttons_layout, 3, 0, 1, 4)
 
-        # Now update status and pause_btn state
         if timer["is_ringing"]:
             card_widget.setProperty("status", "ringing")
             status_label.setText("Ringing!")
@@ -1531,7 +1396,6 @@ class TimerApp(QMainWindow):
             pause_btn.setEnabled(True)
             pause_btn.setStyleSheet("")
 
-        # Force style refresh to apply new properties
         card_widget.style().unpolish(card_widget)
         card_widget.style().polish(card_widget)
 
@@ -1582,7 +1446,6 @@ class TimerApp(QMainWindow):
             self.settings = dialog.get_settings()
             self.save_settings()
             
-            # Update default sound if changed
             if self.settings.get("default_sound"):
                 self.alarm_sound = self.settings["default_sound"]
     
@@ -1607,7 +1470,6 @@ class TimerApp(QMainWindow):
                 timer["sound_path"] = dialog.get_sound_path()
                 self.save_timers()
                 
-                # If timer is ringing, update the sound
                 if timer["is_ringing"] and timer_index in self.media_players:
                     self.media_players[timer_index].stop()
                     self.play_alarm(timer_index)
@@ -1627,13 +1489,12 @@ class TimerApp(QMainWindow):
             "description": timer_data["description"],
             "is_paused": False,
             "has_finished": False,
-            "last_interaction": current_time  # <--- Track last interaction
+            "last_interaction": current_time
         }
         self.timers.insert(0, timer)
-        self.current_primary_timer_index = 0  # <--- New timer is always the active timer
+        self.current_primary_timer_index = 0
         self.save_timers()
         
-        # Create a threading event for this timer
         timer_index = 0
         self.timer_events[timer_index] = threading.Event()
 
@@ -1657,46 +1518,37 @@ class TimerApp(QMainWindow):
         event = self.timer_events[timer_index]
         
         while timer["remaining_seconds"] > 0:
-            # Check if we should pause
             if timer.get("is_paused", False):
-                event.wait()  # Wait until resumed
+                event.wait()
                 event.clear()
                 
                 # Check if the timer was removed while paused
                 if timer_index not in self.timer_events:
                     return
             
-            # Use smaller sleep intervals for more precise timing
-            time.sleep(0.1)  # Check every 100ms instead of 1 second
+            time.sleep(0.1)
             
-            # Calculate actual elapsed time based on real time
             current_time = time.time()
             if not timer.get("is_paused", False):
                 elapsed_since_start = current_time - timer["start_time"]
                 actual_remaining = timer["total_seconds"] - (elapsed_since_start - timer["total_paused_duration"])
                 timer["remaining_seconds"] = max(0, int(actual_remaining))
             
-            # Save every few iterations to reduce I/O
-            if int(current_time * 10) % 10 == 0:  # Save once per second
+            if int(current_time * 10) % 10 == 0:
                 self.save_timers()
         
-        # Timer finished
         timer["is_ringing"] = True
         timer["has_finished"] = True
         self.save_timers(force=True)
         
-        # Send notification if enabled
         if self.settings.get("show_notifications", True):
             notification_text = f"Timer '{timer['name']}' completed!"
             
-            # Add description to notification if enabled
             if self.settings.get("include_description", True) and timer.get("description"):
                 notification_text += f"\n{timer['description'][:50]}..."
             
-            # Set urgency level
             urgency = self.settings.get("notification_urgency", "Normal").lower()
             
-            # Send notification with appropriate urgency
             subprocess.run([
                 "notify-send",
                 "--urgency=" + urgency,
@@ -1704,17 +1556,14 @@ class TimerApp(QMainWindow):
                 notification_text
             ])
         
-        # Mark as finished
         timer["has_finished"] = True
         
-        # Play alarm sound in loop
         self.play_alarm(timer_index)
     
     def pause_resume_timer(self, timer_index):
         if timer_index < len(self.timers):
             timer = self.timers[timer_index]
             
-            # Don't pause if already completed
             if timer["is_ringing"] or timer.get("has_finished", False):
                 return
             
@@ -1728,11 +1577,9 @@ class TimerApp(QMainWindow):
                     timer["pause_time"] = None
                 timer["is_paused"] = False
 
-                # --- Always signal the event to resume the thread ---
                 if timer_index in self.timer_events:
                     self.timer_events[timer_index].set()
 
-                # --- Start a new thread only if needed ---
                 if timer_index not in self.timer_threads or not self.timer_threads[timer_index].is_alive():
                     timer_thread = threading.Thread(
                         target=self.run_timer,
@@ -1742,7 +1589,6 @@ class TimerApp(QMainWindow):
                     self.timer_threads[timer_index] = timer_thread
                     timer_thread.start()
             else:
-                # Pausing: record the pause time
                 timer["pause_time"] = current_time
                 timer["is_paused"] = True
 
@@ -1757,14 +1603,12 @@ class TimerApp(QMainWindow):
         if timer_index < len(self.timers) and self.timers[timer_index]:
             timer = self.timers[timer_index]
             
-            # Create styled message box
             msg_box = QMessageBox(self)
             msg_box.setWindowTitle('Rerun Timer')
             msg_box.setText(f"Are you sure you want to rerun the timer '{timer['name']}'?")
             msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             msg_box.setDefaultButton(QMessageBox.No)
             
-            # Apply theme to message box
             is_dark = detect_system_theme()
             apply_theme_to_widget(msg_box, is_dark)
             
@@ -1773,7 +1617,6 @@ class TimerApp(QMainWindow):
             if reply == QMessageBox.No:
                 return
             
-            # Reset timer properties with precise timing
             current_time = time.time()
             timer["remaining_seconds"] = timer["total_seconds"]
             timer["start_time"] = current_time
@@ -1784,17 +1627,14 @@ class TimerApp(QMainWindow):
             timer["has_finished"] = False
             
             timer["last_interaction"] = current_time
-            self.current_primary_timer_index = timer_index  # <--- Make this the active timer
+            self.current_primary_timer_index = timer_index
             self.save_timers(force=True)
 
-            # Stop any previous alarm thread for this timer
             if timer_index in self.timer_threads and hasattr(self.timer_threads[timer_index], 'stop_event'):
                 self.timer_threads[timer_index].stop_event.set()
 
-            # Create a new threading event
             self.timer_events[timer_index] = threading.Event()
             
-            # Start a new timer thread
             timer_thread = threading.Thread(
                 target=self.run_timer,
                 args=(timer_index,),
@@ -1816,20 +1656,17 @@ class TimerApp(QMainWindow):
 
         timer = self.timers[timer_index]
         sound_path = timer.get("sound_path", "")
-        # Use per-timer sound if set and exists
         if sound_path and os.path.exists(sound_path):
-            pass  # Use this sound
+            pass
         elif self.settings.get("default_sound") and os.path.exists(self.settings["default_sound"]):
             sound_path = self.settings["default_sound"]
         else:
             sound_path = self.alarm_sound
 
-        # Stop any existing alarm thread for this timer
         if timer_index in self.timer_threads and self.timer_threads[timer_index].is_alive():
              if hasattr(self.timer_threads[timer_index], 'stop_event'):
                 self.timer_threads[timer_index].stop_event.set()
 
-        # Use a thread to play sound in a loop via subprocess
         stop_event = threading.Event()
         def sound_loop(path, event):
             while not event.is_set():
@@ -1837,7 +1674,7 @@ class TimerApp(QMainWindow):
                     # Use a short timeout to allow the loop to check the event
                     subprocess.run(["play", "-q", path], timeout=2)
                 except subprocess.TimeoutExpired:
-                    continue # Continue loop if timeout expires
+                    continue
                 except FileNotFoundError:
                     print("Error: 'play' command not found. Please install 'sox'.")
                     break
@@ -1854,15 +1691,14 @@ class TimerApp(QMainWindow):
         if timer_index < len(self.timers) and self.timers[timer_index]:
             timer = self.timers[timer_index]
 
-            # Stop the alarm sound thread
             if timer_index in self.timer_threads and hasattr(self.timer_threads[timer_index], 'stop_event'):
                 self.timer_threads[timer_index].stop_event.set()
 
             timer['is_ringing'] = False
-            timer['is_paused'] = True  # Mark as stopped
-            timer['has_finished'] = True # Mark as finished
+            timer['is_paused'] = True
+            timer['has_finished'] = True
             
-            timer['last_interaction'] = time.time()  # <--- Update interaction timestamp
+            timer['last_interaction'] = time.time()
             self.save_timers()
             self.update_timers_display()
 
@@ -1871,43 +1707,36 @@ class TimerApp(QMainWindow):
         if timer_index < len(self.timers) and self.timers[timer_index]:
             timer = self.timers[timer_index]
             
-            # Create styled message box
             msg_box = QMessageBox(self)
             msg_box.setWindowTitle('Delete Timer')
             msg_box.setText(f"Are you sure you want to delete the timer '{timer['name']}'?")
             msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             msg_box.setDefaultButton(QMessageBox.No)
             
-            # Apply theme to message box
             is_dark = detect_system_theme()
             apply_theme_to_widget(msg_box, is_dark)
             
             reply = msg_box.exec_()
 
             if reply == QMessageBox.Yes:
-                # Stop the alarm sound thread if it's running
                 if timer_index in self.timer_threads and hasattr(self.timer_threads[timer_index], 'stop_event'):
                     self.timer_threads[timer_index].stop_event.set()
 
-                # Clean up resources
                 if timer_index in self.media_players:
                     self.media_players[timer_index].stop()
                     del self.media_players[timer_index]
                 
-                # Use a more robust way to clean up thread-related resources
                 event = self.timer_events.pop(timer_index, None)
                 if event:
-                    event.set() # Signal waiting threads to exit
+                    event.set()
 
                 thread = self.timer_threads.pop(timer_index, None)
                 if thread and thread.is_alive():
                     if hasattr(thread, 'stop_event'):
                         thread.stop_event.set()
 
-                # Remove the timer from the list completely
                 self.timers.pop(timer_index)
                 
-                # Update indices for remaining threads and events
                 self.reindex_timer_resources(timer_index)
                 
                 self.save_timers()
@@ -1915,7 +1744,6 @@ class TimerApp(QMainWindow):
 
     def reindex_timer_resources(self, deleted_index):
         """Reindex timer resources after deletion to maintain consistency."""
-        # Create new dictionaries with updated indices
         new_timer_events = {}
         new_timer_threads = {}
         new_media_players = {}
@@ -1941,16 +1769,13 @@ class TimerApp(QMainWindow):
             elif old_index < deleted_index:
                 new_media_players[old_index] = self.media_players[old_index]
         
-        # Replace the dictionaries
         self.timer_events = new_timer_events
         self.timer_threads = new_timer_threads
         self.media_players = new_media_players
         
-        # Update current_primary_timer_index if needed
         if self.current_primary_timer_index > deleted_index:
             self.current_primary_timer_index -= 1
         elif self.current_primary_timer_index == deleted_index:
-            # If the current primary timer was deleted, find a new one
             running_indices = self.get_running_timer_indices()
             if running_indices:
                 self.current_primary_timer_index = running_indices[0]
@@ -1959,75 +1784,64 @@ class TimerApp(QMainWindow):
 
     def update_timers_display(self):
         """Update the list of timers and the large display."""
-        # Update the large timer display
         self.update_large_timer_display()
 
-        # Get current timer count and sorted order
         current_timer_count = len([t for t in self.timers if t is not None])
         sorted_timer_pairs = self.sort_timers_by_priority()
         current_sorted_indices = [i for _, i in sorted_timer_pairs]
 
-        # Only rebuild if timer count or order changed
         if not hasattr(self, "_last_sorted_indices") or \
            self.last_timer_count != current_timer_count or \
            self._last_sorted_indices != current_sorted_indices:
             self.last_timer_count = current_timer_count
             self._last_sorted_indices = current_sorted_indices
             self.rebuild_timers_list()
-        # Otherwise, just update labels (handled by update_timer_labels_timer)
 
     def get_timer_priority(self, timer):
         """Get priority for timer sorting (lower number = higher priority)"""
         if timer["is_ringing"]:
-            return 0  # Highest priority - ringing timers
+            return 0
         elif not timer.get("has_finished", False) and not timer.get("is_paused", False):
-            return 1  # Running timers
+            return 1
         elif timer.get("is_paused", False):
-            return 2  # Paused timers
+            return 2
         else:
-            return 3  # Finished timers (lowest priority)
+            return 3
 
     def sort_timers_by_priority(self):
         """Sort timers by priority and last interaction (most recent first)"""
         timer_pairs = [(timer, i) for i, timer in enumerate(self.timers) if timer is not None]
         timer_pairs.sort(key=lambda x: (
             self.get_timer_priority(x[0]),
-            -x[0].get("last_interaction", 0)  # <--- Sort by most recent interaction
+            -x[0].get("last_interaction", 0)
         ))
         return timer_pairs
     
     def rebuild_timers_list(self):
         """Rebuild the entire timers list when timers are added/removed."""
-        # Save current scroll position before updating
         scroll_bar = self.timers_list.verticalScrollBar()
         current_scroll_position = scroll_bar.value()
 
-        # Update the list of all timers with priority sorting
         self.timers_list.clear()
         
-        # Get sorted timers by priority
         sorted_timer_pairs = self.sort_timers_by_priority()
         
         for timer, original_index in sorted_timer_pairs:
             item = QListWidgetItem(self.timers_list)
             card_widget, time_label, status_label, pause_btn = self.create_timer_card(timer, original_index)
-            # Retrieve icon_label and status_icon_label from the timer card's children
             icon_label = card_widget.findChild(QLabel, "timerIcon")
             status_icon_label = card_widget.findChild(QLabel, "statusIcon")
 
-            # Ensure proper sizing for smooth scrolling
             card_widget.adjustSize()
             card_widget.updateGeometry()
             
-            # Set a more predictable size hint
             size_hint = card_widget.sizeHint()
-            if size_hint.height() < 100:  # Minimum height for timer cards
+            if size_hint.height() < 100:
                 size_hint.setHeight(120)
             item.setSizeHint(size_hint)
             
             self.timers_list.setItemWidget(item, card_widget)
             
-            # Store dynamic labels for updates
             timer["ui_widgets"] = {
                 "time_label": time_label,
                 "status_label": status_label,
@@ -2036,10 +1850,8 @@ class TimerApp(QMainWindow):
                 "status_icon_label": status_icon_label
             }
 
-        # Process pending events to ensure proper layout
         QApplication.processEvents()
         
-        # Restore scroll position after layout update
         QTimer.singleShot(10, lambda: self.restore_scroll_position(current_scroll_position))
 
     def restore_scroll_position(self, position):
@@ -2055,11 +1867,9 @@ class TimerApp(QMainWindow):
                 ui_widgets = timer["ui_widgets"]
                 if "time_label" in ui_widgets and ui_widgets["time_label"]:
                     try:
-                        # Always show remaining | original
                         ui_widgets["time_label"].setText(
                             f"{self.format_time(timer['remaining_seconds'])} | {self.format_time(timer['total_seconds'])}"
                             )
-                        # Update status label with consistent colors and correct ringing display
                         if "status_label" in ui_widgets and ui_widgets["status_label"]:
                             status_label = ui_widgets["status_label"]
                             status_icon_label = None
@@ -2131,42 +1941,38 @@ class TimerApp(QMainWindow):
         """Switch to the next running timer in the active display."""
         running_indices = self.get_running_timer_indices()
         if len(running_indices) <= 1:
-            return  # No next timer or only one timer
+            return
         
         try:
             current_pos = running_indices.index(self.current_primary_timer_index)
             next_pos = (current_pos + 1) % len(running_indices)
             self.current_primary_timer_index = running_indices[next_pos]
         except ValueError:
-            # Current index not in running timers, use first one
             self.current_primary_timer_index = running_indices[0]
 
     def switch_to_previous_timer(self):
         """Switch to the previous running timer in the active display."""
         running_indices = self.get_running_timer_indices()
         if len(running_indices) <= 1:
-            return  # No previous timer or only one timer
+            return
         
         try:
             current_pos = running_indices.index(self.current_primary_timer_index)
             prev_pos = (current_pos - 1) % len(running_indices)
             self.current_primary_timer_index = running_indices[prev_pos]
         except ValueError:
-            # Current index not in running timers, use first one
             self.current_primary_timer_index = running_indices[0]
 
     def save_timers(self, force=False):
         """Save timers to a JSON file, excluding UI widgets."""
         current_time = time.time()
         
-        # Throttle saves to avoid excessive I/O, unless forced
         if not force and (current_time - self.last_save_time) < self.save_threshold:
             return
         
         timers_to_save = []
         for timer in self.timers:
-            if timer is not None:  # Skip None timers
-                # Create a copy and remove non-serializable items
+            if timer is not None:
                 t_copy = timer.copy()
                 t_copy.pop("ui_widgets", None)
                 timers_to_save.append(t_copy)
@@ -2182,10 +1988,8 @@ class TimerApp(QMainWindow):
             with open(self.state_file, "r") as f:
                 loaded_timers = json.load(f)
                 
-            # Clear existing timers and load saved ones
             self.timers = loaded_timers
             
-            # Update timing information for loaded timers
             current_time = time.time()
             for timer in self.timers:
                 if timer is None:
@@ -2199,27 +2003,21 @@ class TimerApp(QMainWindow):
                 if "total_paused_duration" not in timer:
                     timer["total_paused_duration"] = 0
                 
-                # If timer was paused, update pause_time to current time
                 if timer.get("is_paused", False) and timer.get("pause_time") is None:
                     timer["pause_time"] = current_time
                 
-            # Restart any running timers
             for i, timer in enumerate(self.timers):
                 if timer is None:
                     continue
                 
-                # Create threading event for each timer
                 self.timer_events[i] = threading.Event()
                 
-                # If timer has finished, do not restart it automatically
                 if timer.get("has_finished", False):
                     continue
 
-                # Resume paused timers in paused state
                 if timer.get("is_paused", False):
                     continue
                 elif timer["remaining_seconds"] > 0 and not timer["is_ringing"]:
-                    # Start running timers
                     timer_thread = threading.Thread(
                         target=self.run_timer,
                         args=(i,),
@@ -2228,7 +2026,6 @@ class TimerApp(QMainWindow):
                     self.timer_threads[i] = timer_thread
                     timer_thread.start()
                 elif timer["is_ringing"]:
-                    # Restart ringing timers
                     self.play_alarm(i)
     
     def load_settings(self):
@@ -2247,7 +2044,6 @@ class TimerApp(QMainWindow):
             try:
                 with open(self.settings_file, "r") as f:
                     settings = json.load(f)
-                    # Merge with defaults for any missing keys
                     for key, value in default_settings.items():
                         if key not in settings:
                             settings[key] = value
@@ -2262,23 +2058,18 @@ class TimerApp(QMainWindow):
             json.dump(self.settings, f)
     
     def closeEvent(self, event):
-        # Clean up VLC players
         for player in self.media_players.values():
             player.stop()
         
-        # Stop all alarm threads
         for thread in self.timer_threads.values():
             if hasattr(thread, 'stop_event'):
                 thread.stop_event.set()
 
-        # Resume any paused threads so they can exit
         for i, timer_event in self.timer_events.items():
             timer_event.set()
         
-        # Save timers
         self.save_timers()
         
-        # Save settings
         self.save_settings()
         
         event.accept()
@@ -2289,7 +2080,6 @@ class TimerApp(QMainWindow):
         width = self.width()
         height = self.height()
         
-        # Determine screen size category and font size
         if width < 600:
             font_size = base_font_size * 0.9
             screen_size = "small"
@@ -2300,21 +2090,16 @@ class TimerApp(QMainWindow):
             font_size = base_font_size * 1.1
             screen_size = "large"
 
-        # Apply screen size attribute for responsive CSS
         self.setProperty("screenSize", screen_size)
         
-        # Apply compact mode for short displays (750px height or less for better accessibility)
         compact_mode = height <= 750
         self.setProperty("compactMode", compact_mode)
         
-        # In compact mode, ensure the timers list gets adequate space
         if compact_mode and hasattr(self, 'timers_list'):
-            # Calculate remaining space and set minimum height for timers list
             remaining_height = max(200, height - 400)  # Reserve space for header and active timer
             self.timers_list.setMinimumHeight(min(remaining_height, 300))
             self.timers_list.setMaximumHeight(remaining_height)
             
-            # Reduce layout margins and spacing in compact mode
             central_widget = self.centralWidget()
             if hasattr(central_widget, 'widget'):
                 main_widget = central_widget.widget()
@@ -2323,7 +2108,6 @@ class TimerApp(QMainWindow):
                     layout.setContentsMargins(8, 8, 8, 8)
                     layout.setSpacing(8)
         else:
-            # Restore normal margins and spacing
             central_widget = self.centralWidget()
             if hasattr(central_widget, 'widget'):
                 main_widget = central_widget.widget()
@@ -2332,15 +2116,12 @@ class TimerApp(QMainWindow):
                     layout.setContentsMargins(12, 12, 12, 12)
                     layout.setSpacing(12)
         
-        # Update font
         font = self.font()
         font.setPointSize(int(font_size))
         self.setFont(font)
         
-        # Update stylesheet to reflect font size changes for specific widgets
         self.update_timers_display()
         
-        # Adjust header title font size
         try:
             title_label = self.findChild(QLabel, "headerTitleLabel")
             if title_label:
@@ -2351,11 +2132,9 @@ class TimerApp(QMainWindow):
             # This can happen if the widget is not found during shutdown
             pass
 
-        # Force style refresh to apply responsive changes
         self.style().unpolish(self)
         self.style().polish(self)
         
-        # Apply responsive styles to child widgets
         self.apply_responsive_styles()
 
         super().resizeEvent(event)
@@ -2365,12 +2144,10 @@ class TimerApp(QMainWindow):
         screen_size = self.property("screenSize")
         compact_mode = self.property("compactMode")
         
-        # Apply screen size and compact mode properties to all relevant child widgets
         for widget in self.findChildren(QWidget):
             if hasattr(widget, 'setProperty'):
                 widget.setProperty("screenSize", screen_size)
                 widget.setProperty("compactMode", compact_mode)
-                # Force style refresh
                 widget.style().unpolish(widget)
                 widget.style().polish(widget)
 
@@ -2386,13 +2163,11 @@ class TimerApp(QMainWindow):
         timer = None
         show_active = False
 
-        # Always show the timer at self.current_primary_timer_index if it exists
         if 0 <= self.current_primary_timer_index < len(self.timers):
             timer = self.timers[self.current_primary_timer_index]
             if timer and (not timer.get("has_finished", False) or timer.get("is_ringing", False) or timer.get("is_paused", False)):
                 show_active = True
 
-        # If not, try to find any running/paused/ringing timer
         if not show_active:
             for i, t in enumerate(self.timers):
                 if t and (not t.get("has_finished", False) or t.get("is_ringing", False) or t.get("is_paused", False)):
@@ -2404,11 +2179,9 @@ class TimerApp(QMainWindow):
         if show_active and timer:
             self.active_timer_frame.setVisible(True)
             self.active_timer_placeholder.setVisible(False)
-            # Update navigation button states
             self.large_prev_button.setEnabled(len(self.get_running_timer_indices()) > 1)
             self.large_next_button.setEnabled(len(self.get_running_timer_indices()) > 1)
             
-            # Update display
             self.large_timer_name.setText(timer["name"])
             if timer.get("description"):
                 self.large_timer_description.setText(timer["description"])
@@ -2416,7 +2189,6 @@ class TimerApp(QMainWindow):
             else:
                 self.large_timer_description.setVisible(False)
             
-            # Format time display
             remaining = timer["remaining_seconds"]
             hours = remaining // 3600
             minutes = (remaining % 3600) // 60
@@ -2431,7 +2203,6 @@ class TimerApp(QMainWindow):
             
             self.large_timer_time.setText(time_text)
             
-        # Update status icon and label
             if timer["is_ringing"]:
                 self.large_status_icon.setPixmap(self.get_icon("bell").pixmap(28, 28))
                 self.large_timer_status.setText("Ringing!")
@@ -2449,7 +2220,6 @@ class TimerApp(QMainWindow):
                 self.large_timer_status.setText("Running")
                 self.large_timer_status.setStyleSheet("color: #10b981; font-weight: 500; font-size: 18px;")
 
-            # Update status icon and label
             if timer["is_ringing"]:
                 self.large_status_icon.setPixmap(self.get_icon("bell").pixmap(28, 28))
                 self.large_timer_status.setText("Ringing!")
@@ -2487,7 +2257,6 @@ class TimerApp(QMainWindow):
             self.active_timer_frame.setVisible(False)
             self.active_timer_placeholder.setVisible(True)
         
-        # Update navigation button states
         self.large_prev_button.setEnabled(len(self.get_running_timer_indices()) > 1)
         self.large_next_button.setEnabled(len(self.get_running_timer_indices()) > 1)
         
@@ -2504,7 +2273,6 @@ class TimerCreationDialog(QDialog):
         self.current_description = ""
         self.current_sound = ""
         
-        # Apply theme before setting up UI
         is_dark = detect_system_theme()
         apply_theme_to_widget(self, is_dark)
         
@@ -2515,12 +2283,10 @@ class TimerCreationDialog(QDialog):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(20)
         
-        # Header
         header = QLabel("Create New Timer")
         header.setObjectName("titleLabel")
         layout.addWidget(header)
         
-        # Timer name input
         name_label = QLabel("Timer Name:")
         layout.addWidget(name_label)
         
@@ -2528,7 +2294,6 @@ class TimerCreationDialog(QDialog):
         self.timer_name_input.setPlaceholderText("Enter timer name")
         layout.addWidget(self.timer_name_input)
         
-        # Duration inputs
         duration_label = QLabel("Duration:")
         layout.addWidget(duration_label)
         
@@ -2536,7 +2301,6 @@ class TimerCreationDialog(QDialog):
         duration_layout = QGridLayout(duration_container)
         duration_layout.setSpacing(12)
         
-        # Hours
         hours_label = QLabel("Hours:")
         self.hours_input = QLineEdit()
         self.hours_input.setPlaceholderText("0")
@@ -2545,7 +2309,6 @@ class TimerCreationDialog(QDialog):
         duration_layout.addWidget(hours_label, 0, 0)
         duration_layout.addWidget(self.hours_input, 0, 1)
         
-        # Minutes
         minutes_label = QLabel("Minutes:")
         self.minutes_input = QLineEdit()
         self.minutes_input.setPlaceholderText("0")
@@ -2554,7 +2317,6 @@ class TimerCreationDialog(QDialog):
         duration_layout.addWidget(minutes_label, 0, 2)
         duration_layout.addWidget(self.minutes_input, 0, 3)
         
-        # Seconds
         seconds_label = QLabel("Seconds:")
         self.seconds_input = QLineEdit()
         self.seconds_input.setPlaceholderText("0")
@@ -2566,7 +2328,6 @@ class TimerCreationDialog(QDialog):
         duration_layout.setColumnStretch(4, 1)
         layout.addWidget(duration_container)
         
-        # Quick preset buttons
         presets_label = QLabel("Quick Presets:")
         presets_label.setObjectName("subtitleLabel")
         layout.addWidget(presets_label)
@@ -2574,7 +2335,6 @@ class TimerCreationDialog(QDialog):
         presets_layout = QGridLayout()
         presets_layout.setSpacing(8)
         
-        # Common timer presets
         presets = [
             ("5 min", 0, 5, 0), ("10 min", 0, 10, 0), ("15 min", 0, 15, 0),
             ("30 min", 0, 30, 0), ("1 hour", 1, 0, 0), ("2 hours", 2, 0, 0)
@@ -2589,12 +2349,10 @@ class TimerCreationDialog(QDialog):
         
         layout.addLayout(presets_layout)
         
-        # Options section
         options_label = QLabel("Timer Options:")
         options_label.setObjectName("subtitleLabel")
         layout.addWidget(options_label)
         
-        # Description button
         description_layout = QHBoxLayout()
         self.description_button = QPushButton(" Add Description")
         self.description_button.setIcon(self.parent().get_icon('edit'))
@@ -2606,7 +2364,6 @@ class TimerCreationDialog(QDialog):
         description_layout.addWidget(self.description_status)
         layout.addLayout(description_layout)
         
-        # Sound selection
         sound_layout = QHBoxLayout()
         self.sound_button = QPushButton(" Select Sound")
         self.sound_button.setIcon(self.parent().get_icon('sound'))
@@ -2620,7 +2377,6 @@ class TimerCreationDialog(QDialog):
         
         layout.addStretch()
         
-        # Dialog buttons
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         button_box.button(QDialogButtonBox.Ok).setText("Create Timer")
         button_box.button(QDialogButtonBox.Ok).setObjectName("successButton")
@@ -2661,13 +2417,11 @@ class TimerCreationDialog(QDialog):
             minutes = int(self.minutes_input.text() or "0")
             seconds = int(self.seconds_input.text() or "0")
             
-            # Validate inputs
             if hours < 0 or minutes < 0 or seconds < 0:
                 raise ValueError("Negative values not allowed")
             if minutes >= 60 or seconds >= 60:
                 raise ValueError("Minutes and seconds must be less than 60")
             
-            # Calculate total duration in seconds
             total_seconds = hours * 3600 + minutes * 60 + seconds
             
             if total_seconds <= 0:
@@ -2718,27 +2472,22 @@ def load_svg_icon(icon_path, color="#374151", size=24):
     """Load and color an SVG icon"""
     try:
         if os.path.exists(icon_path):
-            # Read SVG content and replace colors
             with open(icon_path, 'r') as f:
                 svg_content = f.read()
             
-            # Replace common fill attributes with the desired color
             svg_content = svg_content.replace('fill="black"', f'fill="{color}"')
             svg_content = svg_content.replace('fill="#000000"', f'fill="{color}"')
             svg_content = svg_content.replace('fill="#000"', f'fill="{color}"')
             svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
             
-            # Replace stroke attributes (many icons use stroke instead of fill)
             svg_content = svg_content.replace('stroke="black"', f'stroke="{color}"')
             svg_content = svg_content.replace('stroke="#000000"', f'stroke="{color}"')
             svg_content = svg_content.replace('stroke="#000"', f'stroke="{color}"')
             svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
             
-            # If no fill or stroke attribute found, add fill to the root SVG element
             if 'fill=' not in svg_content and 'stroke=' not in svg_content:
                 svg_content = svg_content.replace('<svg', f'<svg fill="{color}"')
             
-            # Create renderer from modified SVG content
             renderer = QSvgRenderer()
             renderer.load(svg_content.encode('utf-8'))
             
@@ -2752,7 +2501,6 @@ def load_svg_icon(icon_path, color="#374151", size=24):
     except Exception as e:
         print(f"Error loading icon {icon_path}: {e}")
     
-    # Return empty icon if loading fails
     return QIcon()
 
 
@@ -2767,68 +2515,54 @@ def create_glass_checkbox(text="", checked=False, parent=None):
             super().__init__(text, parent)
             
         def paintEvent(self, event):
-            # Call the parent paint event first to draw the text
             super().paintEvent(event)
             
-            # Get the indicator rectangle
             option = self.getStyleOption()
             indicator_rect = self.style().subElementRect(
                 self.style().SE_CheckBoxIndicator, option, self
             )
             
-            # Create painter
             painter = QPainter(self)
             painter.setRenderHint(QPainter.Antialiasing)
             
-            # Determine theme
             is_dark = self.property("darkTheme") == True
             
-            # Draw custom indicator background
             if is_dark:
                 if self.isChecked():
-                    # Dark theme checked
                     gradient = QLinearGradient(indicator_rect.topLeft(), indicator_rect.bottomRight())
-                    gradient.setColorAt(0, QColor(92, 170, 197, 242))  # rgba(92, 170, 197, 0.95)
-                    gradient.setColorAt(1, QColor(92, 205, 213, 229))  # rgba(92, 205, 213, 0.9)
+                    gradient.setColorAt(0, QColor(92, 170, 197, 242))
+                    gradient.setColorAt(1, QColor(92, 205, 213, 229))
                     painter.setBrush(QBrush(gradient))
-                    painter.setPen(QPen(QColor(92, 170, 197, 204), 2))  # rgba(92, 170, 197, 0.8)
+                    painter.setPen(QPen(QColor(92, 170, 197, 204), 2))
                 else:
-                    # Dark theme unchecked
-                    painter.setBrush(QBrush(QColor(45, 55, 72, 128)))  # rgba(45, 55, 72, 0.5)
-                    painter.setPen(QPen(QColor(255, 255, 255, 51), 2))  # rgba(255, 255, 255, 0.2)
+                    painter.setBrush(QBrush(QColor(45, 55, 72, 128)))
+                    painter.setPen(QPen(QColor(255, 255, 255, 51), 2))
             else:
                 if self.isChecked():
-                    # Light theme checked
                     gradient = QLinearGradient(indicator_rect.topLeft(), indicator_rect.bottomRight())
-                    gradient.setColorAt(0, QColor(60, 101, 160, 242))  # rgba(60, 101, 160, 0.95)
-                    gradient.setColorAt(1, QColor(92, 170, 197, 229))  # rgba(92, 170, 197, 0.9)
+                    gradient.setColorAt(0, QColor(60, 101, 160, 242))
+                    gradient.setColorAt(1, QColor(92, 170, 197, 229))
                     painter.setBrush(QBrush(gradient))
-                    painter.setPen(QPen(QColor(60, 101, 160, 204), 2))  # rgba(60, 101, 160, 0.8)
+                    painter.setPen(QPen(QColor(60, 101, 160, 204), 2))
                 else:
-                    # Light theme unchecked
-                    painter.setBrush(QBrush(QColor(255, 255, 255, 77)))  # rgba(255, 255, 255, 0.3)
-                    painter.setPen(QPen(QColor(255, 255, 255, 102), 2))  # rgba(255, 255, 255, 0.4)
+                    painter.setBrush(QBrush(QColor(255, 255, 255, 77)))
+                    painter.setPen(QPen(QColor(255, 255, 255, 102), 2))
             
-            # Draw rounded rectangle
             painter.drawRoundedRect(indicator_rect, 8, 8)
             
-            # Draw checkmark if checked
             if self.isChecked():
                 painter.setPen(QPen(QColor(255, 255, 255), 3))
                 
-                # Draw checkmark path
                 check_size = min(indicator_rect.width(), indicator_rect.height()) * 0.6
                 center_x = indicator_rect.center().x()
                 center_y = indicator_rect.center().y()
                 
-                # Checkmark coordinates (relative to center)
                 points = [
                     (center_x - check_size/3, center_y - check_size/6),
                     (center_x - check_size/6, center_y + check_size/6),
                     (center_x + check_size/3, center_y - check_size/3)
                 ]
                 
-                # Draw checkmark lines
                 painter.drawLine(int(points[0][0]), int(points[0][1]), 
                                int(points[1][0]), int(points[1][1]))
                 painter.drawLine(int(points[1][0]), int(points[1][1]), 
@@ -2847,11 +2581,9 @@ def create_glass_checkbox(text="", checked=False, parent=None):
                 option.state |= self.style().State_Off
             return option
     
-    # Create the custom checkbox
     checkbox = GlassCheckBox(text, parent)
     checkbox.setChecked(checked)
     
-    # Apply styling (without the indicator since we're drawing it ourselves)
     checkbox.setStyleSheet("""
         QCheckBox {
             font-weight: 500;
@@ -2871,38 +2603,30 @@ def create_glass_checkbox(text="", checked=False, parent=None):
         }
     """)
     
-    # Apply theme
     is_dark = detect_system_theme()
     apply_theme_to_widget(checkbox, is_dark)
     
     return checkbox
 
 def main():
-    # Parse command line arguments
     args = parse_arguments()
     
-    # Create QApplication
     app = QApplication(sys.argv)
     
-    # Set application properties
     app.setApplicationName(APP_NAME)
     app.setApplicationVersion(APP_VERSION)
     app.setOrganizationName(APP_DEVELOPER)
     
-    # Load and apply styles
     styles = load_and_apply_styles()
     if styles:
         app.setStyleSheet(styles)
     
-    # Create and show main window
     window = TimerApp(args)
     window.show()
     
-    # Apply theme to main window
     is_dark = detect_system_theme()
     apply_theme_to_widget(window, is_dark)
     
-    # Start the application
     sys.exit(app.exec_())
 
 

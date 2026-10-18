@@ -1,4 +1,4 @@
-# TimeRing ⏰
+# TimeRing
 
 <div align="center">
   <img src="images/logo.png" alt="TimeRing Logo" width="128" height="128">
@@ -14,10 +14,10 @@
 
   <br>
   
-  [**📥 Download**](https://sourceforge.net/projects/timering/) • 
-  [**🐙 GitHub**](https://github.com/Lusan-sapkota/TimeRing) • 
-  [**📖 Documentation**](#-usage-guide) • 
-  [**🐛 Report Issues**](https://github.com/Lusan-sapkota/TimeRing/issues)
+  [**Download**](https://sourceforge.net/projects/timering/) • 
+  [**GitHub**](https://github.com/Lusan-sapkota/TimeRing) • 
+  [**Documentation**](#usage-guide) • 
+  [**Report Issues**](https://github.com/Lusan-sapkota/TimeRing/issues)
 </div>
 
 <br>
@@ -30,24 +30,24 @@
 
 ## Table of Contents
 
-- [Why TimeRing?](#-why-timering)
-- [Features](#-features)
-- [Quick Start](#-quick-start)
-- [Usage Guide](#-usage-guide)
-- [Managing Active Timers](#-managing-active-timers)
-- [Timer States & Visual Indicators](#-timer-states--visual-indicators)
-- [Active Timer Block](#-active-timer-block)
-- [Settings & Customization](#-settings--customization)
-- [Advanced Configuration](#-advanced-configuration)
-- [Platform Compatibility](#-platform-compatibility)
-- [Contributing](#-contributing)
-- [Roadmap](#-roadmap)
-- [Support](#-support)
-- [License](#-license)
-- [Author](#-author)
-- [Acknowledgments](#-acknowledgments)
+- [Why TimeRing?](#why-timering)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Usage Guide](#usage-guide)
+- [Managing Active Timers](#managing-active-timers)
+- [Timer States & Visual Indicators](#timer-states--visual-indicators)
+- [Active Timer Block](#active-timer-block)
+- [Settings & Customization](#settings--customization)
+- [Advanced Configuration](#advanced-configuration)
+- [Platform Compatibility](#platform-compatibility)
+- [Contributing](#contributing)
+- [Roadmap](#roadmap)
+- [Support](#support)
+- [License](#license)
+- [Author](#author)
+- [Acknowledgments](#acknowledgments)
 
-## 🌟 Why TimeRing?
+## Why TimeRing?
 
 TimeRing transforms how you manage time on your desktop. Whether you're following the Pomodoro Technique, timing cooking recipes, or managing multiple work sessions, TimeRing provides an intuitive and powerful solution that stays out of your way while keeping you on track.
 
@@ -60,32 +60,32 @@ TimeRing transforms how you manage time on your desktop. Whether you're followin
 <div align="center">
 <table>
 <tr>
-<td align="center">🍅<br><b>Pomodoro Technique</b><br>practitioners</td>
-<td align="center">👨‍💻<br><b>Developers</b><br>managing sprint tasks</td>
-<td align="center">🍳<br><b>Cooking</b><br>enthusiasts</td>
-<td align="center">📚<br><b>Students</b><br>using time-blocking</td>
-<td align="center">🏃‍♂️<br><b>Fitness</b><br>interval training</td>
+<td align="center"><b>Pomodoro Technique</b><br>practitioners</td>
+<td align="center"><b>Developers</b><br>managing sprint tasks</td>
+<td align="center"><b>Cooking</b><br>enthusiasts</td>
+<td align="center"><b>Students</b><br>using time-blocking</td>
+<td align="center"><b>Fitness</b><br>interval training</td>
 </tr>
 </table>
 </div>
 
 ---
 
-## ✨ Features
+## Features
 
 <div align="center">
 <table>
 <tr>
 <td width="50%">
 
-### 🎯 Core Timer Management
+### Core Timer Management
 - **Multiple Concurrent Timers** - Run unlimited timers simultaneously without interference
 - **Priority Timer System** - Most important timer always displayed prominently at the top
 - **Active Timer Block** - Large, dedicated display with enhanced controls for your current focus
 - **Smart Timer Navigation** - Seamlessly switch between multiple running timers
 - **Custom Names & Descriptions** - Personalize each timer with meaningful labels and detailed notes
 
-### 🔊 Smart Notifications
+### Smart Notifications
 - **Custom Notification Sounds** - Assign unique audio alerts for different timer types
 - **Continuous Audio Alerts** - Sounds loop until acknowledged, ensuring you never miss an alert
 - **Native Desktop Integration** - Works seamlessly with KDE, GNOME, and other Linux desktop environments
@@ -94,13 +94,13 @@ TimeRing transforms how you manage time on your desktop. Whether you're followin
 </td>
 <td width="50%">
 
-### 🎨 Modern User Experience
+### Modern User Experience
 - **Clean, Intuitive Interface** - Thoughtfully designed with smooth animations and slide-in menus
 - **System-Native Icons** - Automatically uses your system's icon theme for consistency
 - **Responsive Design** - Adapts beautifully to different screen sizes, including 720p displays
 - **Real-Time Status Updates** - Clear visual feedback for running, paused, ringing, and finished states
 
-### ⚙️ Advanced Capabilities
+### Advanced Capabilities
 - **Persistent State Management** - Automatically saves and restores timers across application restarts
 - **Flexible Timer Controls** - Pause, resume, stop, and instantly rerun any timer
 - **Auto-Update System** - One-click updates when new versions are available
@@ -115,15 +115,15 @@ TimeRing transforms how you manage time on your desktop. Whether you're followin
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-### 📦 Easy Installation (Recommended)
+### Easy Installation (Recommended)
 
 <div align="center">
 <table>
 <tr>
 <td align="center" width="50%">
-<h4>🐧 Ubuntu/Debian (GitHub)</h4>
+<h4>Ubuntu/Debian (GitHub)</h4>
 
 <details>
 <summary><strong>Install from GitHub Release (.zip)</strong></summary>
@@ -151,7 +151,7 @@ sudo dpkg -r timering
 
 </td>
 <td align="center" width="50%">
-<h4>📁 Direct .deb Download (SourceForge)</h4>
+<h4>Direct .deb Download (SourceForge)</h4>
 
 <p>
 <strong>Prefer a direct .deb file?</strong><br>
@@ -188,10 +188,10 @@ sudo dpkg -r timering
 </table>
 </div>
 
-### 🛠️ Manual Installation
+### Manual Installation
 
 <details>
-<summary><strong>🔧 Click to expand manual installation instructions</strong></summary>
+<summary><strong>Click to expand manual installation instructions</strong></summary>
 
 <br>
 
@@ -228,30 +228,30 @@ python3 main.py
 
 ---
 
-## 📚 Usage Guide
+## Usage Guide
 
-### 🎯 Creating Your First Timer
+### Creating Your First Timer
 
 <div align="center">
 <table>
 <tr>
 <td align="center" width="25%">
-<h4>1️⃣ Enter Details</h4>
+<h4>1. Enter Details</h4>
 Give your timer a meaningful name<br>
 <i>(e.g., "Work Session", "Tea Brewing")</i>
 </td>
 <td align="center" width="25%">
-<h4>2️⃣ Set Duration</h4>
+<h4>2. Set Duration</h4>
 Set time in hours, minutes, seconds anything you want<br>
 <i>(or simply use the quick time)</i>
 </td>
 <td align="center" width="25%">
-<h4>3️⃣ Add Description</h4>
+<h4>3. Add Description</h4>
 Click the icon to add<br>
 max 50 words description <i>(optional)</i>
 </td>
 <td align="center" width="25%">
-<h4>4️⃣ Choose Sound</h4>
+<h4>4. Choose Sound</h4>
 Click the icon to select<br>
 custom sound, can be customized per timer or global deafult <i>(optional)</i>
 </td>
@@ -260,11 +260,11 @@ custom sound, can be customized per timer or global deafult <i>(optional)</i>
 </div>
 
 <div align="center">
-<h4>5️⃣ Start Timer</h4>
+<h4>5. Start Timer</h4>
 Click <b>"Create Timer"</b> and watch it appear in your active timers list
 </div>
 
-### 🎮 Managing Active Timers
+### Managing Active Timers
 
 Each timer card displays comprehensive information and controls:
 
@@ -273,7 +273,7 @@ Each timer card displays comprehensive information and controls:
 <tr>
 <td width="50%">
 
-#### 📋 Timer Information
+#### Timer Information
 - **Timer Name & Icon** - Always visible, with status-specific icons
 - **Description** - Optional details shown below the name
 - **Time Display** - Shows remaining time and original duration
@@ -282,7 +282,7 @@ Each timer card displays comprehensive information and controls:
 </td>
 <td width="50%">
 
-#### 🎛️ Available Controls
+#### Available Controls
 - **Edit** - Change timer name and description
 - **Change Sound** - Select custom notification sound
 - **Pause/Resume** - Toggle timer state
@@ -294,7 +294,7 @@ Each timer card displays comprehensive information and controls:
 </table>
 </div>
 
-### 🎨 Timer States & Visual Indicators
+### Timer States & Visual Indicators
 
 <div align="center">
 
@@ -332,9 +332,9 @@ Each timer card displays comprehensive information and controls:
 </table>
 </div>
 
-> **💡 Pro Tip:** Icons provide instant visual feedback - look for the color-coded status indicators to quickly understand your timer states at a glance!
+> ** Pro Tip:** Icons provide instant visual feedback - look for the color-coded status indicators to quickly understand your timer states at a glance!
 
-### 🎯 Active Timer Block
+### Active Timer Block
 
 The large, dedicated display at the top shows your current focus timer:
 
@@ -343,7 +343,7 @@ The large, dedicated display at the top shows your current focus timer:
 <tr>
 <td width="50%">
 
-#### 📊 Display Elements
+#### Display Elements
 - **Timer Name & Description** - Centered, always visible
 - **Large Time Display** - Easy-to-read countdown
 - **Status Row** - Centered icon and text
@@ -352,7 +352,7 @@ The large, dedicated display at the top shows your current focus timer:
 </td>
 <td width="50%">
 
-#### 🎛️ Enhanced Controls
+#### Enhanced Controls
 - **Previous/Next** - Switch between running timers
 - **Pause/Resume** - Toggle timer state
 - **Stop** - Halt timer and silence alarms
@@ -363,7 +363,7 @@ The large, dedicated display at the top shows your current focus timer:
 </table>
 </div>
 
-### ⚙️ Settings & Customization
+### Settings & Customization
 
 Access powerful configuration options through the header icons:
 
@@ -371,7 +371,7 @@ Access powerful configuration options through the header icons:
 <table>
 <tr>
 <td align="center" width="33%">
-<h4>🛠️ Settings</h4>
+<h4>Settings</h4>
 • Global default notification sound<br>
 • Desktop notifications toggle<br>
 • Auto-start timers on launch<br>
@@ -379,7 +379,7 @@ Access powerful configuration options through the header icons:
 • Update checks & sound looping
 </td>
 <td align="center" width="33%">
-<h4>❓ Help</h4>
+<h4>Help</h4>
 • User guide & tutorials<br>
 • Troubleshooting tips<br>
 • Keyboard shortcuts<br>
@@ -387,7 +387,7 @@ Access powerful configuration options through the header icons:
 • Best practices
 </td>
 <td align="center" width="33%">
-<h4>ℹ️ About</h4>
+<h4>About</h4>
 • Version information<br>
 • Developer details<br>
 • System compatibility<br>
@@ -400,9 +400,9 @@ Access powerful configuration options through the header icons:
 
 ---
 
-## 🛠️ Advanced Configuration
+## Advanced Configuration
 
-### 📁 Configuration Files
+### Configuration Files
 
 TimeRing stores all settings in your home directory:
 
@@ -412,7 +412,7 @@ TimeRing stores all settings in your home directory:
 └── timers.json       # Current timer states (auto-saved)
 ```
 
-### 🎨 Custom Styling
+### Custom Styling
 
 Personalize TimeRing's appearance by modifying `style.qss`:
 
@@ -440,7 +440,7 @@ QMainWindow {
 }
 ```
 
-### ⌨️ Command Line Options
+### Command Line Options
 
 <div align="center">
 <table>
@@ -473,14 +473,14 @@ python3 main.py --config-dir ~/.timering
 
 ---
 
-## 🖥️ Platform Compatibility
+## Platform Compatibility
 
 <div align="center">
 <table>
 <tr>
 <td align="center" width="50%">
 
-### 🐧 **Primary Platform: Linux**
+### **Primary Platform: Linux**
 
 **Supported Distributions:**
 - Ubuntu 20.04+ / Debian 11+
@@ -491,7 +491,7 @@ python3 main.py --config-dir ~/.timering
 </td>
 <td align="center" width="50%">
 
-### 🖥️ **Desktop Environments**
+### **Desktop Environments**
 
 **Fully Tested:**
 - KDE Plasma 5.20+
@@ -504,11 +504,11 @@ python3 main.py --config-dir ~/.timering
 </table>
 </div>
 
-> **🔧 Windows/macOS Support:** While TimeRing may run on other platforms with Python and PyQt5, some features (particularly desktop notifications and audio) are optimized for Linux and may require additional configuration.
+> ** Windows/macOS Support:** While TimeRing may run on other platforms with Python and PyQt5, some features (particularly desktop notifications and audio) are optimized for Linux and may require additional configuration.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the community! Here's how you can help make TimeRing even better:
 
@@ -516,30 +516,30 @@ We welcome contributions from the community! Here's how you can help make TimeRi
 <table>
 <tr>
 <td align="center" width="20%">
-<h4>🐛 Report Bugs</h4>
+<h4>Report Bugs</h4>
 <a href="https://github.com/Lusan-sapkota/TimeRing/issues">GitHub Issues</a>
 </td>
 <td align="center" width="20%">
-<h4>💡 Suggest Features</h4>
+<h4>Suggest Features</h4>
 <a href="https://github.com/Lusan-sapkota/TimeRing/discussions">Discussions</a>
 </td>
 <td align="center" width="20%">
-<h4>🔧 Submit PRs</h4>
+<h4>Submit PRs</h4>
 <a href="https://github.com/Lusan-sapkota/TimeRing/pulls">Pull Requests</a>
 </td>
 <td align="center" width="20%">
-<h4>📖 Improve Docs</h4>
+<h4>Improve Docs</h4>
 <a href="https://github.com/Lusan-sapkota/TimeRing/wiki">Wiki</a>
 </td>
 <td align="center" width="20%">
-<h4>🌍 Translate</h4>
+<h4>Translate</h4>
 <a href="https://github.com/Lusan-sapkota/TimeRing/tree/main/translations">i18n</a>
 </td>
 </tr>
 </table>
 </div>
 
-### 🚀 Development Setup
+### Development Setup
 
 ```bash
 # 1. Fork and clone your repository
@@ -560,7 +560,7 @@ python -m pytest tests/
 python3 main.py
 ```
 
-### 📋 Pull Request Guidelines
+### Pull Request Guidelines
 
 1. **Fork** the repository and create a feature branch
 2. **Write** clear, commented code following PEP 8
@@ -570,20 +570,20 @@ python3 main.py
 
 ---
 
-## 📈 Roadmap
+## Roadmap
 
 <div align="center">
 <table>
 <tr>
 <td width="50%">
 
-### 🎯 **Upcoming Features**
+### **Upcoming Features**
 While active development may be limited, maintenance updates and essential patches will be provided as needed to ensure continued stability and usability.
 
 </td>
 <td width="50%">
 
-### 📝 **Version History**
+### **Version History**
 - **v1.0.0** - Initial release with core timer functionality
 
 </td>
@@ -593,34 +593,34 @@ While active development may be limited, maintenance updates and essential patch
 
 ---
 
-## 🆘 Support
+## Support
 
-### 🔍 Getting Help
+### Getting Help
 
 <div align="center">
 <table>
 <tr>
 <td align="center" width="33%">
-<h4>📖 Documentation</h4>
+<h4>Documentation</h4>
 Check this README and<br>
 <a href="https://github.com/Lusan-sapkota/TimeRing/wiki">project wiki</a>
 </td>
 <td align="center" width="33%">
-<h4>💬 Community</h4>
+<h4>Community</h4>
 Join our <a href="https://github.com/Lusan-sapkota/TimeRing/discussions">GitHub Discussions</a>
 </td>
 <td align="center" width="33%">
-<h4>🐛 Bug Reports</h4>
+<h4>Bug Reports</h4>
 Use our <a href="https://github.com/Lusan-sapkota/TimeRing/issues">Issue Tracker</a>
 </td>
 </tr>
 </table>
 </div>
 
-### 🔧 Common Issues
+### Common Issues
 
 <details>
-<summary><b>🔊 Audio notifications not working</b></summary>
+<summary><b> Audio notifications not working</b></summary>
 
 <br>
 
@@ -639,7 +639,7 @@ sudo pacman -S vlc
 </details>
 
 <details>
-<summary><b>🔔 Desktop notifications not showing</b></summary>
+<summary><b> Desktop notifications not showing</b></summary>
 
 <br>
 
@@ -658,7 +658,7 @@ notify-send "Test" "This is a test notification"
 </details>
 
 <details>
-<summary><b>🐍 Python version compatibility</b></summary>
+<summary><b> Python version compatibility</b></summary>
 
 <br>
 
@@ -674,13 +674,13 @@ sudo apt install python3.11
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 <div align="center">
 <table>
@@ -701,25 +701,25 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 <div align="center">
 <table>
 <tr>
 <td align="center" width="25%">
-<h4>🛠️ Technology</h4>
+<h4>Technology</h4>
 PyQt5 community for the<br>excellent GUI framework
 </td>
 <td align="center" width="25%">
-<h4>🤝 Contributors</h4>
+<h4>Contributors</h4>
 All contributors who have<br>helped improve TimeRing
 </td>
 <td align="center" width="25%">
-<h4>🧪 Testing</h4>
+<h4>Testing</h4>
 Beta testers who provided<br>valuable feedback
 </td>
 <td align="center" width="25%">
-<h4>🎨 Design</h4>
+<h4>Design</h4>
 Icon designers for<br>beautiful system icons
 </td>
 </tr>
@@ -729,9 +729,9 @@ Icon designers for<br>beautiful system icons
 ---
 
 <div align="center">
-<h2>⭐ Star this repository if TimeRing helps you manage your time better!</h2>
+<h2> Star this repository if TimeRing helps you manage your time better!</h2>
 
-<p><i>Made with ❤️ for productivity enthusiasts</i></p>
+<p><i>Made with  for productivity enthusiasts</i></p>
 
 <br>
 

@@ -36,45 +36,38 @@ class GlassCheckBox(QCheckBox):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         
-        # Get checkbox rect
         option = self.styleOption()
         rect = self.style().subElementRect(self.style().SE_CheckBoxIndicator, option, self)
         
-        # Determine if dark theme
         is_dark = self.property("darkTheme") == True
         
-        # Draw background
         if is_dark:
-            bg_color = QColor(45, 55, 72, 102)  # rgba(45, 55, 72, 0.4)
-            border_color = QColor(255, 255, 255, 51)  # rgba(255, 255, 255, 0.2)
+            bg_color = QColor(45, 55, 72, 102)
+            border_color = QColor(255, 255, 255, 51)
         else:
-            bg_color = QColor(255, 255, 255, 51)  # rgba(255, 255, 255, 0.2)
-            border_color = QColor(255, 255, 255, 102)  # rgba(255, 255, 255, 0.4)
+            bg_color = QColor(255, 255, 255, 51)
+            border_color = QColor(255, 255, 255, 102)
         
-        # Create gradient for checked state
         if self.isChecked():
             gradient = QLinearGradient(rect.topLeft(), rect.bottomRight())
             if is_dark:
-                gradient.setColorAt(0, QColor(92, 170, 197, 229))  # rgba(92, 170, 197, 0.9)
-                gradient.setColorAt(1, QColor(92, 205, 213, 229))  # rgba(92, 205, 213, 0.9)
-                border_color = QColor(92, 170, 197, 204)  # rgba(92, 170, 197, 0.8)
+                gradient.setColorAt(0, QColor(92, 170, 197, 229))
+                gradient.setColorAt(1, QColor(92, 205, 213, 229))
+                border_color = QColor(92, 170, 197, 204)
             else:
-                gradient.setColorAt(0, QColor(60, 101, 160, 229))  # rgba(60, 101, 160, 0.9)
-                gradient.setColorAt(1, QColor(92, 170, 197, 229))  # rgba(92, 170, 197, 0.9)
-                border_color = QColor(60, 101, 160, 204)  # rgba(60, 101, 160, 0.8)
+                gradient.setColorAt(0, QColor(60, 101, 160, 229))
+                gradient.setColorAt(1, QColor(92, 170, 197, 229))
+                border_color = QColor(60, 101, 160, 204)
             
             painter.setBrush(QBrush(gradient))
         else:
             painter.setBrush(QBrush(bg_color))
         
-        # Draw border
         pen = QPen(border_color, 2)
         painter.setPen(pen)
         
-        # Draw rounded rectangle
         painter.drawRoundedRect(rect, 8, 8)
         
-        # Draw checkmark if checked
         if self.isChecked():
             painter.setPen(QPen(QColor(255, 255, 255), 2))
             font = QFont()
@@ -82,13 +75,11 @@ class GlassCheckBox(QCheckBox):
             font.setBold(True)
             painter.setFont(font)
             
-            # Draw Unicode checkmark
             painter.drawText(rect, Qt.AlignCenter, "✓")
         
-        # Draw the text
         if self.text():
             text_rect = self.rect()
-            text_rect.setLeft(rect.right() + 8)  # 8px spacing
+            text_rect.setLeft(rect.right() + 8)
             painter.setPen(QPen(QColor(29, 29, 31) if not is_dark else QColor(245, 245, 247)))
             painter.drawText(text_rect, Qt.AlignVCenter | Qt.AlignLeft, self.text())
     
@@ -171,17 +162,14 @@ def apply_glass_checkbox_style():
 
 
 if __name__ == "__main__":
-    # Test the custom checkbox
     import sys
     from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget
     
     app = QApplication(sys.argv)
     
-    # Create test window
     window = QWidget()
     layout = QVBoxLayout(window)
     
-    # Add custom checkboxes
     cb1 = GlassCheckBox("Light theme checkbox")
     cb2 = GlassCheckBox("Dark theme checkbox")
     cb2.setProperty("darkTheme", True)

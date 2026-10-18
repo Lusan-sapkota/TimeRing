@@ -1,4 +1,4 @@
-/* TimeRing Glassy Theme – Apple-Style Glass Interface */
+/* TimeRing Glassy Theme: Apple-Style Glass Interface */
 
 /* === GLOBAL === */
 QWidget[darkTheme="false"] {
@@ -60,7 +60,6 @@ QPushButton:pressed {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Secondary Glass Button */
 QPushButton#secondaryButton {
     background-color: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(60, 101, 160, 0.3);
@@ -82,7 +81,6 @@ QPushButton#secondaryButton[darkTheme="true"]:hover {
     border: 1px solid rgba(92, 170, 197, 0.5);
 }
 
-/* Danger Glass Button */
 QPushButton#dangerButton {
     background-color: rgba(229, 62, 62, 0.9);
     color: #FFFFFF;
@@ -94,7 +92,6 @@ QPushButton#dangerButton:hover {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Disabled Button Styling */
 QPushButton:disabled {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                stop:0 rgba(107, 114, 128, 0.6),
@@ -194,7 +191,6 @@ QWidget[darkTheme="true"] QLabel#subtitleLabel {
 }
 
 /* === TIMERS LIST WIDGET === */
-/* Enhanced styling for the timers list */
 QListWidget {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                                stop:0 rgba(255, 255, 255, 0.2),
@@ -307,7 +303,6 @@ QCheckBox::indicator:checked {
 
 /* Qt CSS doesn't support ::after, so we'll handle this in Python code */
 
-/* Dark theme checkbox */
 QWidget[darkTheme="true"] QCheckBox::indicator {
     border: 2px solid rgba(255, 255, 255, 0.2);
     background-color: rgba(45, 55, 72, 0.4);
@@ -506,8 +501,8 @@ QGroupBox {
     color: #3C65A0;
     border: 1px solid rgba(60, 101, 160, 0.2);
     border-radius: 12px;
-    margin-top: 24px;  /* Increased margin to prevent title cutoff */
-    padding: 24px 16px 16px 16px;  /* Increased top padding */
+    margin-top: 24px;
+    padding: 24px 16px 16px 16px;
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                                stop:0 rgba(255, 255, 255, 0.15),
                                stop:0.5 rgba(255, 255, 255, 0.1),
@@ -517,9 +512,9 @@ QGroupBox {
 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top left;
-    padding: 8px 16px;  /* Increased padding for better spacing */
+    padding: 8px 16px;
     margin-left: 12px;
-    margin-top: 2px;  /* Small top margin for better positioning */
+    margin-top: 2px;
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                stop:0 rgba(60, 101, 160, 0.85),
                                stop:1 rgba(43, 76, 128, 0.8));
@@ -528,7 +523,7 @@ QGroupBox::title {
     font-size: 12px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    top: -14px;  /* Adjusted position */
+    top: -14px;
 }
 
 QWidget[darkTheme="true"] QGroupBox {
@@ -549,7 +544,6 @@ QWidget[darkTheme="true"] QGroupBox::title {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Dialog Button Styling */
 QDialogButtonBox QPushButton {
     min-width: 100px;
     padding: 10px 20px;
@@ -602,7 +596,6 @@ QWidget[darkTheme="true"] QScrollBar::handle:vertical:hover {
 }
 
 /* === MAIN SCROLL AREA === */
-/* Styling for the main scroll area */
 QScrollArea {
     background: transparent;
     border: none;
@@ -724,9 +717,7 @@ QWidget[darkTheme="true"] QLabel#timerTime {
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Pulsing animation for active timers - Removed (not supported in Qt CSS) */
 
-/* Special styling for timer cards with different states */
 QFrame#timerCard[status="running"] {
     border: 2px solid rgba(34, 197, 94, 0.8);
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
@@ -758,10 +749,8 @@ QFrame#timerCard[status="ringing"] {
 }
 
 /* === ENHANCED TIMER LABELS === */
-/* Base styling for all timer names in timer cards */
 
 
-/* Base styling for timer descriptions in timer cards */
 QLabel#timerDescription {
     font-size: 15px;
     font-weight: 500;
@@ -776,7 +765,6 @@ QWidget[darkTheme="true"] QLabel#timerDescription {
     color: #9CA3AF;
 }
 
-/* Make active timer names more prominent */
 QFrame#timerCard[status="running"] QLabel#timerName {
     font-size: 20px;
     font-weight: 800;
@@ -801,7 +789,6 @@ QFrame#timerCard[status="ringing"] QLabel#timerName {
     text-shadow: 0px 1px 3px rgba(239, 68, 68, 0.4);
 }
 
-/* Dark theme active timer names */
 QWidget[darkTheme="true"] QFrame#timerCard[status="running"] QLabel#timerName {
     color: #10B981;
     text-shadow: 0px 1px 2px rgba(16, 185, 129, 0.4);
@@ -817,7 +804,6 @@ QWidget[darkTheme="true"] QFrame#timerCard[status="ringing"] QLabel#timerName {
     text-shadow: 0px 1px 3px rgba(248, 113, 113, 0.5);
 }
 
-/* Enhanced descriptions for active states */
 QFrame#timerCard[status="running"] QLabel#timerDescription {
     font-size: 16px;
     font-weight: 550;
@@ -849,7 +835,6 @@ QWidget[darkTheme="true"] QFrame#timerCard[status="ringing"] QLabel#timerDescrip
 }
 
 /* === LARGE ACTIVE TIMER NAME STYLING === */
-/* Make the large active timer name even more prominent */
 QLabel#timerNameLabel {
     font-size: 26px;
     font-weight: 800;
@@ -877,7 +862,6 @@ QWidget[darkTheme="true"] QLabel#timerNameLabel {
 }
 
 /* === TIMER DESCRIPTION STYLING === */
-/* Enhanced timer description label */
 QLabel#timerDescriptionLabel {
     font-size: 14px;
     font-weight: 500;
@@ -901,7 +885,6 @@ QWidget[darkTheme="true"] QLabel#timerDescriptionLabel {
 }
 
 /* === ACTIVE TIMER SECTION PLACEHOLDER === */
-/* Enhanced placeholder text for empty active timer area */
 QLabel#activeTimerPlaceholder {
     font-size: 18px;
     font-weight: 500;
@@ -928,7 +911,6 @@ QWidget[darkTheme="true"] QLabel#activeTimerPlaceholder {
 }
 
 /* === ACTIVE TIMER FRAME STYLING === */
-/* Enhanced styling for the active timer frame */
 QFrame#activeTimerFrame {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                                stop:0 rgba(255, 255, 255, 0.45),
@@ -953,7 +935,6 @@ QWidget[darkTheme="true"] QFrame#activeTimerFrame {
 }
 
 /* === RESPONSIVE DESIGN === */
-/* Enhanced responsive classes for different screen sizes */
 QWidget[screenSize="small"] QFrame#timerCard {
     padding: 16px;
     margin: 8px 4px;
@@ -1032,7 +1013,6 @@ QWidget[screenSize="medium"] QFrame#activeTimerFrame {
     border-radius: 16px;
 }
 
-/* Large screen optimizations */
 QWidget[screenSize="large"] QFrame#timerCard {
     padding: 28px;
     margin: 14px 0;
@@ -1065,7 +1045,6 @@ QWidget[screenSize="large"] QFrame#activeTimerFrame {
 }
 
 /* === COMPACT MODE FOR SHORT DISPLAYS === */
-/* Special compact mode for displays with limited height (like 720px) */
 QWidget[compactMode="true"] QLabel#largeTimerDisplay {
     font-size: 28px;
     padding: 6px 4px;
@@ -1101,7 +1080,6 @@ QWidget[compactMode="true"] QLabel#subtitleLabel {
     padding: 1px 0px;
 }
 
-/* Ensure timers list gets minimum height in compact mode */
 QWidget[compactMode="true"] QListWidget {
     min-height: 180px;
     max-height: 350px;
@@ -1113,7 +1091,6 @@ QWidget[compactMode="true"] QListWidget::item {
     min-height: 100px;
 }
 
-/* Make timer cards more compact in compact mode */
 QWidget[compactMode="true"] QFrame#timerCard {
     padding: 8px;
     margin: 2px 0px;
@@ -1140,23 +1117,19 @@ QWidget[compactMode="true"] QLabel#timerTime {
     border-radius: 8px;
 }
 
-/* Compact mode for buttons and controls */
 QWidget[compactMode="true"] QPushButton {
     padding: 6px 12px;
     font-size: 12px;
     border-radius: 8px;
 }
 
-/* Reduce header spacing in compact mode */
 QWidget[compactMode="true"] QLabel#headerTitleLabel {
     font-size: 16px;
     margin: 2px 0px;
 }
 
 /* === ENHANCED ACTIVE TIMER GLOW EFFECT === */
-/* Enhanced glow effect for running timers using Qt-supported properties */
 QFrame#timerCard[status="running"] {
-    /* Enhanced border and background for visual prominence */
     border: 3px solid rgba(34, 197, 94, 0.95);
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                                stop:0 rgba(34, 197, 94, 0.15),
@@ -1164,7 +1137,6 @@ QFrame#timerCard[status="running"] {
                                stop:0.5 rgba(255, 255, 255, 0.35),
                                stop:0.98 rgba(34, 197, 94, 0.12),
                                stop:1 rgba(34, 197, 94, 0.1));
-    /* Add inner shadow effect using extra border */
     outline: 1px solid rgba(34, 197, 94, 0.3);
     outline-offset: -1px;
 }
@@ -1193,7 +1165,6 @@ QFrame#timerCard[status="ringing"] {
     outline-offset: -2px;
 }
 
-/* Enhanced active timer for dark theme */
 QWidget[darkTheme="true"] QFrame#timerCard[status="running"] {
     border: 3px solid rgba(16, 185, 129, 0.95);
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
@@ -1251,7 +1222,7 @@ QLabel#helpContent[darkTheme="true"] {
 QComboBox {
     border: 1px solid rgba(60, 101, 160, 0.3);
     border-radius: 12px;
-    padding: 10px 16px;  /* Increased padding for better look */
+    padding: 10px 16px;
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                stop:0 rgba(255, 255, 255, 0.4),
                                stop:1 rgba(255, 255, 255, 0.3));
@@ -1260,7 +1231,7 @@ QComboBox {
     font-weight: 500;
     selection-background-color: rgba(60, 101, 160, 0.2);
     min-width: 120px;
-    min-height: 20px;  /* Ensure minimum height */
+    min-height: 20px;
 }
 
 QComboBox:hover {
@@ -1277,7 +1248,7 @@ QComboBox:focus {
 QComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: top right;
-    width: 24px;  /* Slightly wider for better appearance */
+    width: 24px;
     border-left: 1px solid rgba(60, 101, 160, 0.3);
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
@@ -1288,7 +1259,7 @@ QComboBox::drop-down {
 
 QComboBox::down-arrow {
     image: none;
-    border-left: 5px solid transparent;  /* Slightly larger arrow */
+    border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-top: 7px solid #3C65A0;
     width: 0;
@@ -1310,12 +1281,12 @@ QComboBox QAbstractItemView {
 }
 
 QComboBox QAbstractItemView::item {
-    padding: 10px 16px;  /* Increased padding for better spacing */
+    padding: 10px 16px;
     border-radius: 8px;
     margin: 2px;
     background: transparent;
     color: #1D1D1F;
-    min-height: 16px;  /* Ensure minimum height for items */
+    min-height: 16px;
 }
 
 QComboBox QAbstractItemView::item:hover {
@@ -1333,7 +1304,6 @@ QComboBox QAbstractItemView::item:selected {
     font-weight: 600;
 }
 
-/* Dark theme QComboBox */
 QWidget[darkTheme="true"] QComboBox {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                stop:0 rgba(45, 55, 72, 0.6),
@@ -1404,7 +1374,6 @@ QWidget[darkTheme="true"] QLabel {
     color: #F5F5F7;
 }
 
-/* Settings dialog specific label styling */
 QDialog QLabel {
     color: #3C65A0;
     font-weight: 500;

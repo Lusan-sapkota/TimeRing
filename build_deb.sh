@@ -1,9 +1,8 @@
 #!/bin/bash
 
 # TimeRing .deb Build Script
-# This script creates a Debian package for the TimeRing application
 
-set -e  # Exit on any error
+set -e
 
 # Configuration
 APP_NAME="TimeRing"
@@ -20,7 +19,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 # Logging functions
 log_info() {

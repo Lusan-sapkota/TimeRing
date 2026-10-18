@@ -1,12 +1,12 @@
 # TimeRing .deb Package Build - Quick Guide
 
-## 🚀 One-Command Build
+## One-Command Build
 
 ```bash
 make build
 ```
 
-## 📋 Step-by-Step Instructions
+## Step-by-Step Instructions
 
 ### 1. Install Dependencies
 ```bash
@@ -44,20 +44,20 @@ TimeRing
 ```
 Or find "TimeRing" in your application menu.
 
-## 📦 What Gets Built
+## What Gets Built
 
 - **Package**: `build/timering_1.0.0.deb`
 - **Size**: ~500KB (estimated)
 - **Dependencies**: python3, python3-pyqt5, python3-vlc, vlc
 
-## 🎯 Distribution
+## Distribution
 
 The built `.deb` package can be:
 - Shared with other Ubuntu/Debian users
 - Installed on multiple machines
 - Distributed through package repositories
 
-## ❓ Troubleshooting
+## Troubleshooting
 
 **Permission denied?**
 ```bash
